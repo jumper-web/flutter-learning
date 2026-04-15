@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flutter 对比学习 — Java 后端开发者指南</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500;700;900&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-deep:#0a0e17;--bg-card:#111827;--bg-card-hover:#1a2332;--bg-code:#0d1117;
+  --accent-java:#f89820;--accent-java-dim:rgba(248,152,32,.12);
+  --accent-spring:#6db33f;--accent-spring-dim:rgba(109,179,63,.12);
+  --accent-flutter:#027DFD;--accent-flutter-dim:rgba(2,125,253,.12);
+  --accent-dart:#0175C2;
+  --text-primary:#e2e8f0;--text-secondary:#94a3b8;--text-muted:#64748b;
+  --border:rgba(255,255,255,.06);--border-active:rgba(255,255,255,.12);
+  --radius:16px;--radius-sm:10px;--sidebar-w:250px;
+  --font-mono:'JetBrains Mono','Fira Code',monospace;
+  --font-sans:'Noto Sans SC',-apple-system,sans-serif;
+  --font-display:'Playfair Display',serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-sans);background:var(--bg-deep);color:var(--text-primary);line-height:1.7;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:9999}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--text-muted);border-radius:3px}
+
+/* Sidebar */
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sidebar-w);background:rgba(10,14,23,.95);backdrop-filter:blur(20px) saturate(1.5);border-right:1px solid var(--border);z-index:200;display:flex;flex-direction:column;transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.sidebar-header{padding:1.5rem 1.25rem 1rem;border-bottom:1px solid var(--border);flex-shrink:0}
+.sidebar-logo{font-family:var(--font-mono);font-weight:600;font-size:.82rem;color:var(--accent-flutter);display:flex;align-items:center;gap:8px;margin-bottom:.4rem}
+.sidebar-logo .li{width:26px;height:26px;border-radius:7px;background:var(--accent-flutter-dim);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700}
+.sidebar-sub{font-size:.68rem;color:var(--text-muted);letter-spacing:.04em}
+.sidebar-nav{flex:1;overflow-y:auto;padding:.5rem 0;scrollbar-width:thin}
+.sidebar-nav::-webkit-scrollbar{width:3px}.sidebar-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+.nav-group{margin-bottom:.25rem}
+.nav-group-label{padding:8px 1.25rem 4px;font-size:.6rem;font-weight:600;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase}
+.nav-link{display:flex;align-items:center;gap:8px;padding:6px 1.25rem;color:var(--text-muted);text-decoration:none;font-size:.78rem;font-weight:500;border-left:2px solid transparent;transition:all .2s;cursor:pointer}
+.nav-link:hover{color:var(--text-primary);background:rgba(255,255,255,.03);border-left-color:rgba(255,255,255,.1)}
+.nav-link.active{color:var(--accent-flutter);background:var(--accent-flutter-dim);border-left-color:var(--accent-flutter)}
+.nav-link .nn{font-family:var(--font-mono);font-size:.6rem;color:var(--text-muted);min-width:18px}
+.sidebar-footer{padding:.75rem 1.25rem;border-top:1px solid var(--border);flex-shrink:0}
+.sidebar-tags{display:flex;flex-wrap:wrap;gap:5px}
+.stag{padding:2px 7px;border-radius:100px;font-size:.58rem;font-weight:600;border:1px solid}
+.stag.java{color:var(--accent-java);border-color:rgba(248,152,32,.3);background:var(--accent-java-dim)}
+.stag.spring{color:var(--accent-spring);border-color:rgba(109,179,63,.3);background:var(--accent-spring-dim)}
+.stag.flutter{color:var(--accent-flutter);border-color:rgba(2,125,253,.3);background:var(--accent-flutter-dim)}
+.sidebar-toggle{display:none;position:fixed;top:1rem;left:1rem;z-index:300;width:40px;height:40px;border-radius:10px;border:1px solid var(--border);background:rgba(10,14,23,.9);backdrop-filter:blur(10px);color:var(--text-primary);font-size:1.1rem;cursor:pointer;align-items:center;justify-content:center;transition:all .2s}
+.sidebar-toggle:hover{background:rgba(255,255,255,.05)}
+
+/* Main */
+.main-wrapper{margin-left:var(--sidebar-w);min-height:100vh}
+.hero{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 600px 400px at 30% 50%,rgba(248,152,32,.08),transparent),radial-gradient(ellipse 500px 500px at 70% 30%,rgba(109,179,63,.06),transparent),radial-gradient(ellipse 600px 400px at 50% 80%,rgba(2,125,253,.08),transparent);animation:heroPulse 8s ease-in-out infinite alternate}
+@keyframes heroPulse{0%{opacity:.7}100%{opacity:1}}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 60% at 50% 50%,black,transparent)}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:100px;border:1px solid var(--border-active);background:rgba(255,255,255,.03);font-size:.8rem;color:var(--text-secondary);letter-spacing:.05em;margin-bottom:2rem;backdrop-filter:blur(10px);animation:fadeInUp .8s ease-out}
+.hero-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--accent-java);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.hero h1{font-family:var(--font-display);font-size:clamp(2.2rem,5vw,4.5rem);font-weight:700;line-height:1.1;margin-bottom:1.5rem;animation:fadeInUp .8s ease-out .1s both}
+.hero h1 .line1{color:var(--text-primary)}
+.hero h1 .line2{display:block;background:linear-gradient(135deg,var(--accent-java),var(--accent-spring),var(--accent-flutter));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-subtitle{font-size:1.05rem;color:var(--text-secondary);max-width:650px;margin-bottom:3rem;font-weight:300;animation:fadeInUp .8s ease-out .2s both}
+.hero-tags{display:flex;gap:.75rem;flex-wrap:wrap;justify-content:center;animation:fadeInUp .8s ease-out .3s both}
+.hero-tag{padding:10px 22px;border-radius:100px;font-size:.85rem;font-weight:500;letter-spacing:.02em;border:1px solid;transition:all .3s;cursor:default}
+.hero-tag.java{color:var(--accent-java);border-color:rgba(248,152,32,.3);background:var(--accent-java-dim)}
+.hero-tag.spring{color:var(--accent-spring);border-color:rgba(109,179,63,.3);background:var(--accent-spring-dim)}
+.hero-tag.flutter{color:var(--accent-flutter);border-color:rgba(2,125,253,.3);background:var(--accent-flutter-dim)}
+.hero-tag:hover{transform:translateY(-2px)}
+.scroll-hint{position:absolute;bottom:2rem;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--text-muted);font-size:.75rem;letter-spacing:.1em;animation:fadeInUp .8s ease-out .5s both}
+.scroll-hint .arrow{width:20px;height:30px;border:2px solid var(--text-muted);border-radius:10px;position:relative}
+.scroll-hint .arrow::after{content:'';position:absolute;top:6px;left:50%;transform:translateX(-50%);width:3px;height:6px;background:var(--text-muted);border-radius:2px;animation:scrollDown 1.5s ease-in-out infinite}
+@keyframes scrollDown{0%{transform:translateX(-50%) translateY(0);opacity:1}100%{transform:translateX(-50%) translateY(8px);opacity:0}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* Content */
+.content{max-width:1200px;margin:0 auto;padding:4rem 2rem 6rem}
+.section{margin-bottom:6rem;animation:fadeInUp .6s ease-out both}
+.section-header{display:flex;align-items:center;gap:1rem;margin-bottom:2.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+.section-number{font-family:var(--font-mono);font-size:.75rem;color:var(--accent-flutter);background:var(--accent-flutter-dim);padding:4px 10px;border-radius:6px;letter-spacing:.05em}
+.section-title{font-size:1.6rem;font-weight:700;letter-spacing:-.02em}
+.section-desc{color:var(--text-secondary);font-size:.95rem;margin-bottom:2rem;max-width:800px;line-height:1.8}
+
+/* Compare Grid (3 col: Java | diff | Dart) */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:2rem}
+.compare-col{background:var(--bg-card);padding:1.5rem;transition:background .3s}
+.compare-col:hover{background:var(--bg-card-hover)}
+.compare-col-header{display:flex;align-items:center;gap:8px;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:2px solid;font-weight:600;font-size:.85rem;letter-spacing:.02em}
+.compare-col-header.java{border-color:var(--accent-java);color:var(--accent-java)}
+.compare-col-header.spring{border-color:var(--accent-spring);color:var(--accent-spring)}
+.compare-col-header.flutter{border-color:var(--accent-flutter);color:var(--accent-flutter)}
+.compare-col-header.diff{border-color:var(--text-muted);color:var(--text-secondary)}
+.compare-col-header .icon{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-family:var(--font-mono);font-weight:700}
+.compare-col-header.java .icon{background:var(--accent-java-dim)}
+.compare-col-header.spring .icon{background:var(--accent-spring-dim)}
+.compare-col-header.flutter .icon{background:var(--accent-flutter-dim)}
+.compare-col-header.diff .icon{background:rgba(255,255,255,.05)}
+
+/* Code */
+.code-block{background:var(--bg-code);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin:.75rem 0}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:.7rem;color:var(--text-muted)}
+.code-header .lang-tag{padding:2px 8px;border-radius:4px;font-weight:600;letter-spacing:.05em}
+.code-header .lang-tag.java-tag{background:rgba(248,152,32,.1);color:var(--accent-java)}
+.code-header .lang-tag.spring-tag{background:rgba(109,179,63,.1);color:var(--accent-spring)}
+.code-header .lang-tag.dart{background:rgba(2,125,253,.1);color:var(--accent-flutter)}
+.code-header .lang-tag.yaml{background:rgba(255,255,255,.05);color:var(--text-secondary)}
+pre{padding:1rem 1.2rem;overflow-x:auto;font-family:var(--font-mono);font-size:.76rem;line-height:1.7;color:var(--text-primary);scrollbar-width:thin}
+pre::-webkit-scrollbar{height:4px}pre::-webkit-scrollbar-thumb{background:var(--text-muted);border-radius:2px}
+.kw{color:#c678dd}.fn{color:#61afef}.str{color:#98c379}.num{color:#d19a66}.cm{color:#5c6370;font-style:italic}.type{color:#e5c07b}.op{color:#56b6c2}.prop{color:#e06c75}.dec{color:#c678dd}.tag{color:#e06c75}.attr{color:#d19a66}
+
+/* Cards */
+.info-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.5rem;transition:all .3s}
+.info-card:hover{border-color:var(--border-active);transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.info-card h3{font-size:1.05rem;margin-bottom:.75rem;display:flex;align-items:center;gap:8px}
+.info-card h3 .emoji{font-size:1.2rem}
+.info-card p,.info-card li{color:var(--text-secondary);font-size:.88rem;line-height:1.8}
+.info-card ul{list-style:none;padding:0}
+.info-card ul li{padding:4px 0 4px 1.2rem;position:relative}
+.info-card ul li::before{content:'›';position:absolute;left:0;color:var(--accent-flutter);font-weight:700}
+
+/* Tables */
+.mapping-table{width:100%;border-collapse:separate;border-spacing:0;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);margin:1.5rem 0}
+.mapping-table th{background:rgba(255,255,255,.03);padding:12px 16px;text-align:left;font-size:.8rem;font-weight:600;color:var(--text-secondary);letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--border)}
+.mapping-table td{padding:10px 16px;font-size:.85rem;border-bottom:1px solid var(--border);color:var(--text-primary);transition:background .2s}
+.mapping-table tr:last-child td{border-bottom:none}
+.mapping-table tr:hover td{background:rgba(255,255,255,.02)}
+.mapping-table .java-col{font-family:var(--font-mono);font-size:.8rem;color:var(--accent-java)}
+.mapping-table .flutter-col{font-family:var(--font-mono);font-size:.8rem;color:var(--accent-flutter)}
+
+/* Question */
+.question-block{background:linear-gradient(135deg,rgba(248,152,32,.05),rgba(2,125,253,.03));border:1px solid rgba(248,152,32,.15);border-radius:var(--radius);padding:1.5rem;margin:1.5rem 0;position:relative}
+.question-block::before{content:'?';position:absolute;top:-10px;left:20px;width:24px;height:24px;background:var(--accent-java);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;font-family:var(--font-mono)}
+.question-block .q{font-weight:700;font-size:1rem;margin-bottom:.75rem;color:var(--text-primary)}
+.question-block .a{color:var(--text-secondary);font-size:.9rem;line-height:1.8}
+
+/* Arch */
+.arch-diagram{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;margin:2rem 0;text-align:center}
+.arch-diagram pre{display:inline-block;text-align:left;font-size:.72rem;color:var(--accent-flutter);line-height:1.6}
+.arch-diagram .label{font-size:.8rem;color:var(--text-muted);margin-top:1rem;font-style:italic}
+
+/* Roadmap */
+.roadmap{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem;margin:2rem 0}
+.roadmap-step{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;transition:all .3s}
+.roadmap-step:hover{border-color:var(--accent-flutter);box-shadow:0 0 40px rgba(2,125,253,.15);transform:translateY(-3px)}
+.roadmap-step .step-num{font-family:var(--font-display);font-size:2.5rem;font-weight:700;color:rgba(248,152,32,.15);line-height:1;margin-bottom:.5rem}
+.roadmap-step h4{font-size:1rem;margin-bottom:.5rem}
+.roadmap-step p{color:var(--text-secondary);font-size:.85rem;line-height:1.7}
+
+/* Two col */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0}
+
+/* Dep */
+.dep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;margin:1.5rem 0}
+.dep-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.2rem;display:flex;align-items:center;gap:1rem;transition:all .2s}
+.dep-card:hover{border-color:var(--border-active);background:var(--bg-card-hover)}
+.dep-card .dep-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-family:var(--font-mono);font-weight:700;flex-shrink:0}
+.dep-card .dep-icon.net{background:rgba(2,125,253,.12);color:var(--accent-flutter)}
+.dep-card .dep-icon.state{background:rgba(131,51,255,.12);color:#8333ff}
+.dep-card .dep-icon.ui{background:rgba(109,179,63,.12);color:var(--accent-spring)}
+.dep-card .dep-icon.media{background:rgba(247,223,30,.12);color:#f7df1e}
+.dep-card .dep-icon.file{background:rgba(225,112,85,.12);color:#e17055}
+.dep-card .dep-icon.pay{background:rgba(253,121,168,.12);color:#fd79a8}
+.dep-card .dep-info h5{font-size:.85rem;font-family:var(--font-mono);margin-bottom:2px}
+.dep-card .dep-info span{font-size:.75rem;color:var(--text-muted)}
+
+/* Footer */
+.footer{text-align:center;padding:4rem 2rem;color:var(--text-muted);font-size:.8rem;border-top:1px solid var(--border)}
+.footer .method-tags{display:flex;justify-content:center;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.footer .method-tag{padding:6px 16px;border-radius:100px;border:1px solid var(--border);font-size:.75rem;color:var(--text-secondary)}
+
+/* Responsive */
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}
+  .sidebar-toggle{display:flex}.main-wrapper{margin-left:0}
+  .compare-grid{grid-template-columns:1fr}.two-col{grid-template-columns:1fr}
+  .content{padding:2rem 1rem 4rem}
+}
+@media(max-width:600px){.hero h1{font-size:2rem}.hero-subtitle{font-size:.95rem}.roadmap{grid-template-columns:1fr}.dep-grid{grid-template-columns:1fr}}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<button class="sidebar-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')" aria-label="Toggle menu">☰</button>
+
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo"><span class="li">F</span> flutter-guide</div>
+    <div class="sidebar-sub">Java 后端 → Flutter 对比学习</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label">概览</div>
+      <a class="nav-link" href="#roadmap"><span class="nn">01</span>学习路线</a>
+      <a class="nav-link" href="#why"><span class="nn">02</span>为什么你能学</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">语法基础</div>
+      <a class="nav-link" href="#syntax"><span class="nn">03</span>变量 & 类型</a>
+      <a class="nav-link" href="#null-safety"><span class="nn">04</span>空安全</a>
+      <a class="nav-link" href="#class-constructor"><span class="nn">05</span>类 & 构造函数</a>
+      <a class="nav-link" href="#params"><span class="nn">06</span>参数系统</a>
+      <a class="nav-link" href="#collection"><span class="nn">07</span>集合操作</a>
+      <a class="nav-link" href="#async"><span class="nn">08</span>异步模型</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">框架核心</div>
+      <a class="nav-link" href="#ioc"><span class="nn">09</span>IoC & 依赖注入</a>
+      <a class="nav-link" href="#routing"><span class="nn">10</span>路由</a>
+      <a class="nav-link" href="#http"><span class="nn">11</span>网络请求</a>
+      <a class="nav-link" href="#state"><span class="nn">12</span>状态管理</a>
+      <a class="nav-link" href="#widgets"><span class="nn">13</span>UI 组件</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">工程化</div>
+      <a class="nav-link" href="#model"><span class="nn">14</span>分层架构</a>
+      <a class="nav-link" href="#deps"><span class="nn">15</span>依赖生态</a>
+      <a class="nav-link" href="#env"><span class="nn">16</span>多环境配置</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-tags">
+      <span class="stag java">Java</span>
+      <span class="stag spring">Spring Boot</span>
+      <span class="stag flutter">Flutter / Dart</span>
+    </div>
+  </div>
+</aside>
+
+<div class="main-wrapper">
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-badge"><span class="dot"></span>对比法 & 追问式学习</div>
+  <h1>
+    <span class="line1">Java 后端开发者的</span>
+    <span class="line2">Flutter 学习指南</span>
+  </h1>
+  <p class="hero-subtitle">
+    用你已经掌握的 Java / Spring Boot 知识，通过对比和追问，快速理解 Flutter + Dart 的开发范式
+  </p>
+  <div class="hero-tags">
+    <span class="hero-tag java">Java</span>
+    <span class="hero-tag spring">Spring Boot</span>
+    <span class="hero-tag flutter">Flutter / Dart</span>
+  </div>
+  <div class="scroll-hint"><div class="arrow"></div>SCROLL</div>
+</section>
+
+<main class="content">
+
+<!-- 01 学习路线 -->
+<section class="section reveal" id="roadmap">
+  <div class="section-header">
+    <span class="section-number">01</span>
+    <h2 class="section-title">学习路线</h2>
+  </div>
+  <p class="section-desc">你已经有 Java 的强类型思维、面向对象经验、分层架构理解。Dart 对你来说就是"简化版 Java + 一点 JS 的灵活性"。</p>
+  <div class="roadmap">
+    <div class="roadmap-step"><div class="step-num">01</div><h4>Dart 语法速通</h4><p>对标 Java 语法：类型系统、final/const、类继承、泛型、async/await。你会发现 80% 的概念都是熟悉的。</p></div>
+    <div class="roadmap-step"><div class="step-num">02</div><h4>Widget 入门</h4><p>理解"万物皆 Widget" — 类似 Java Swing/JavaFX 的组件树，但更现代。跑一个小 Demo APP。</p></div>
+    <div class="roadmap-step"><div class="step-num">03</div><h4>架构映射</h4><p>把 Spring Boot 的 Controller → Service → Repository 映射到 Flutter 的 Page → Controller → API。</p></div>
+    <div class="roadmap-step"><div class="step-num">04</div><h4>AI 辅助开发</h4><p>结合 AI 进行项目开发，不懂的直接问。不需要记住所有 Widget 属性，用到再查。</p></div>
+  </div>
+</section>
+
+<!-- 02 为什么你能学 -->
+<section class="section reveal" id="why">
+  <div class="section-header">
+    <span class="section-number">02</span>
+    <h2 class="section-title">为什么 Java 后端能快速上手 Flutter</h2>
+  </div>
+
+  <div class="info-card">
+    <h3><span class="emoji">☕</span> 你已经会的，Dart 都有</h3>
+    <table class="mapping-table" style="margin-top:.75rem">
+      <thead><tr><th>Java 概念</th><th>Dart 对应</th><th>差异</th></tr></thead>
+      <tbody>
+        <tr><td class="java-col">强类型 + 类型推断 (var)</td><td class="flutter-col">强类型 + var / final</td><td>几乎一致，Dart 的 var 更像 Java 10+ 的 var</td></tr>
+        <tr><td class="java-col">class / extends / implements</td><td class="flutter-col">class / extends / implements</td><td>写法几乎一样，Dart 没有 interface 关键字（类即接口）</td></tr>
+        <tr><td class="java-col">泛型 List&lt;String&gt;</td><td class="flutter-col">List&lt;String&gt;</td><td>完全一致</td></tr>
+        <tr><td class="java-col">@Override 注解</td><td class="flutter-col">@override 装饰器</td><td>写法一样，小写</td></tr>
+        <tr><td class="java-col">try / catch / finally</td><td class="flutter-col">try / catch / finally</td><td>完全一致</td></tr>
+        <tr><td class="java-col">enum</td><td class="flutter-col">enum（增强版）</td><td>Dart enum 可以有方法和字段</td></tr>
+        <tr><td class="java-col">单例模式</td><td class="flutter-col">factory 构造函数</td><td>Dart 内置语法支持，不用写 getInstance()</td></tr>
+        <tr><td class="java-col">Builder 模式</td><td class="flutter-col">命名参数 {}</td><td>Dart 原生支持，不用写 Builder 类</td></tr>
+        <tr><td class="java-col">Spring IoC / @Autowired</td><td class="flutter-col">GetX Get.put / Get.find</td><td>思路一致：注册 → 获取</td></tr>
+        <tr><td class="java-col">@PostConstruct</td><td class="flutter-col">onInit()</td><td>GetxController 的生命周期钩子</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="question-block">
+    <div class="q">Dart 和 Java 最大的区别是什么？</div>
+    <div class="a">三个核心区别：① Dart 有 <code>async/await</code>（Java 用 CompletableFuture）；② Dart 函数是一等公民，可以当参数传（Java 用 Lambda/Function 接口）；③ Dart 没有 CSS，UI 全靠 Widget 对象树嵌套。其他的你会发现写起来和 Java 非常像。</div>
+  </div>
+</section>
+
+<!-- 03 变量 & 类型 -->
+<section class="section reveal" id="syntax">
+  <div class="section-header">
+    <span class="section-number">03</span>
+    <h2 class="section-title">变量 & 类型 — Java vs Dart</h2>
+  </div>
+  <p class="section-desc">Dart 的类型系统和 Java 非常接近，都是强类型。主要区别在于 Dart 多了 <code>const</code>（编译时常量）和 <code>dynamic</code>（≈ Object）。</p>
+
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-col-header java"><span class="icon">J</span> Java</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag java-tag">JAVA</span></div>
+<pre><span class="kw">final</span> <span class="type">String</span> name = <span class="str">"hello"</span>;  <span class="cm">// 不可重新赋值</span>
+<span class="type">int</span> count = <span class="num">0</span>;               <span class="cm">// 可重新赋值</span>
+<span class="kw">var</span> old = <span class="str">"legacy"</span>;          <span class="cm">// Java 10+ 类型推断</span>
+
+<span class="kw">static final</span> <span class="type">String</span> API =   <span class="cm">// 编译时常量</span>
+  <span class="str">"https://api.com"</span>;
+
+<span class="type">int</span> age = <span class="num">25</span>;
+<span class="type">Object</span> data = <span class="str">"anything"</span>;   <span class="cm">// 任意类型</span>
+
+<span class="cm">// 基本类型</span>
+<span class="type">int</span>, <span class="type">double</span>, <span class="type">boolean</span>, <span class="type">String</span>
+<span class="type">List</span>&lt;<span class="type">String</span>&gt;, <span class="type">Map</span>&lt;<span class="type">String</span>,<span class="type">Object</span>&gt;</pre>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header diff"><span class="icon">⇄</span> 差异说明</div>
+      <div style="padding:.5rem 0;font-size:.83rem;color:var(--text-secondary);line-height:1.9">
+        <p>Java <code>final</code> = Dart <code style="color:var(--accent-flutter)">final</code>（运行时常量）</p>
+        <p>Java <code>static final</code> ≈ Dart <code style="color:var(--accent-flutter)">const</code>（编译时常量）</p>
+        <p>Java <code>var</code> = Dart <code style="color:var(--accent-flutter)">var</code>（类型推断后锁定）</p>
+        <p>Java <code>Object</code> ≈ Dart <code style="color:var(--accent-flutter)">dynamic</code>（可随时改类型）</p>
+        <p>Dart 没有 <code>int/Integer</code> 区分，统一 <code style="color:var(--accent-flutter)">int</code></p>
+        <p>Dart <code style="color:var(--accent-flutter)">bool</code> 不是 <code>boolean</code></p>
+        <p>Dart 字符串用单引号 <code style="color:var(--accent-flutter)">'hello'</code></p>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header flutter"><span class="icon">D</span> Dart</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span></div>
+<pre><span class="kw">final</span> <span class="type">String</span> name = <span class="str">'hello'</span>;  <span class="cm">// 运行时常量</span>
+<span class="type">int</span> count = <span class="num">0</span>;               <span class="cm">// 可重新赋值</span>
+<span class="kw">var</span> old = <span class="str">'legacy'</span>;          <span class="cm">// 类型推断，锁定</span>
+
+<span class="kw">const</span> <span class="type">String</span> API =           <span class="cm">// 编译时常量</span>
+  <span class="str">'https://api.com'</span>;
+
+<span class="type">int</span> age = <span class="num">25</span>;
+<span class="kw">dynamic</span> data = <span class="str">'anything'</span>;   <span class="cm">// 任意类型</span>
+
+<span class="cm">// 基本类型</span>
+<span class="type">int</span>, <span class="type">double</span>, <span class="type">bool</span>, <span class="type">String</span>
+<span class="type">List</span>&lt;<span class="type">String</span>&gt;, <span class="type">Map</span>&lt;<span class="type">String</span>,<span class="kw">dynamic</span>&gt;</pre>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="font-size:1.1rem;margin:2rem 0 1rem">函数 — Lambda vs 箭头函数</h3>
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-col-header java"><span class="icon">J</span> Java</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag java-tag">JAVA</span></div>
+<pre><span class="cm">// 方法</span>
+<span class="kw">public</span> <span class="type">int</span> <span class="fn">add</span>(<span class="type">int</span> a, <span class="type">int</span> b) {
+  <span class="kw">return</span> a + b;
+}
+
+<span class="cm">// Lambda</span>
+<span class="type">BiFunction</span>&lt;<span class="type">Integer</span>,<span class="type">Integer</span>,<span class="type">Integer</span>&gt; add
+  = (a, b) <span class="op">-></span> a + b;
+
+<span class="cm">// 方法引用</span>
+list.<span class="fn">forEach</span>(System.out::println);
+
+<span class="cm">// 没有 async/await</span>
+<span class="type">CompletableFuture</span>.<span class="fn">supplyAsync</span>(() <span class="op">-></span> {
+  <span class="kw">return</span> restTemplate.<span class="fn">getForObject</span>(url);
+});</pre>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header diff"><span class="icon">⇄</span> 差异说明</div>
+      <div style="padding:.5rem 0;font-size:.83rem;color:var(--text-secondary);line-height:1.9">
+        <p>Dart 函数是一等公民，不需要 Function 接口</p>
+        <p>Dart <code style="color:var(--accent-flutter)">=></code> 箭头只能写<strong>一行</strong></p>
+        <p>多行用 <code style="color:var(--accent-flutter)">{}</code> 函数体（和 Java 一样）</p>
+        <p>Dart 有 <code style="color:var(--accent-flutter)">async/await</code>（Java 没有）</p>
+        <p>Dart 函数需声明返回类型（和 Java 一样）</p>
+        <p>Dart 支持顶层函数（不用放在类里）</p>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header flutter"><span class="icon">D</span> Dart</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span></div>
+<pre><span class="cm">// 函数</span>
+<span class="type">int</span> <span class="fn">add</span>(<span class="type">int</span> a, <span class="type">int</span> b) {
+  <span class="kw">return</span> a + b;
+}
+
+<span class="cm">// 箭头函数（仅一行）</span>
+<span class="type">int</span> <span class="fn">add</span>(<span class="type">int</span> a, <span class="type">int</span> b) <span class="op">=></span> a + b;
+
+<span class="cm">// 函数当参数传</span>
+list.<span class="fn">forEach</span>(<span class="fn">print</span>);
+
+<span class="cm">// async/await — 比 Java 简洁得多</span>
+<span class="type">Future</span>&lt;<span class="type">String</span>&gt; <span class="fn">fetchData</span>() <span class="kw">async</span> {
+  <span class="kw">final</span> res = <span class="kw">await</span> dio.<span class="fn">get</span>(url);
+  <span class="kw">return</span> res.data;
+}</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 空安全 -->
+<section class="section reveal" id="null-safety">
+  <div class="section-header">
+    <span class="section-number">04</span>
+    <h2 class="section-title">空安全 — Optional 的进化版</h2>
+  </div>
+  <p class="section-desc">Java 用 Optional + @Nullable 处理空值，Dart 直接在类型系统层面解决 — 更简洁，更安全。</p>
+
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-col-header java"><span class="icon">J</span> Java</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag java-tag">JAVA</span></div>
+<pre><span class="cm">// Optional 包装</span>
+<span class="type">Optional</span>&lt;<span class="type">String</span>&gt; name =
+  <span class="type">Optional</span>.<span class="fn">ofNullable</span>(user.<span class="fn">getName</span>());
+
+<span class="type">String</span> val = name.<span class="fn">orElse</span>(<span class="str">"default"</span>);
+<span class="type">int</span> len = name.<span class="fn">map</span>(<span class="type">String</span>::length)
+  .<span class="fn">orElse</span>(<span class="num">0</span>);
+
+<span class="cm">// @Nullable 注解提示</span>
+<span class="kw">public</span> <span class="type">void</span> <span class="fn">setName</span>(
+  <span class="dec">@Nullable</span> <span class="type">String</span> name) { }
+
+<span class="cm">// 经典 NPE 防御</span>
+<span class="kw">if</span> (user != <span class="kw">null</span>
+    && user.<span class="fn">getName</span>() != <span class="kw">null</span>) {
+  <span class="cm">// ...</span>
+}</pre>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header diff"><span class="icon">⇄</span> 差异说明</div>
+      <div style="padding:.5rem 0;font-size:.83rem;color:var(--text-secondary);line-height:1.9">
+        <p>Dart <code style="color:var(--accent-flutter)">String?</code> ≈ Optional&lt;String&gt;</p>
+        <p>Dart <code style="color:var(--accent-flutter)">??</code> ≈ orElse()</p>
+        <p>Dart <code style="color:var(--accent-flutter)">?.</code> ≈ map() 链式调用</p>
+        <p>Dart <code style="color:var(--accent-flutter)">!</code> ≈ get()（强制取值）</p>
+        <p>Dart <code style="color:var(--accent-flutter)">??=</code> 空值赋值（Java 没有）</p>
+        <p>Dart <code style="color:var(--accent-flutter)">late</code> ≈ 延迟初始化字段</p>
+        <p>Dart 默认不可 null，编译器强制检查</p>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header flutter"><span class="icon">D</span> Dart</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span></div>
+<pre><span class="cm">// 类型后加 ? 表示可空</span>
+<span class="type">String</span>? name;        <span class="cm">// 可以为 null</span>
+<span class="type">String</span> title = <span class="str">''</span>;   <span class="cm">// 不可为 null</span>
+
+<span class="type">String</span> val = name ?? <span class="str">'default'</span>;
+<span class="type">int</span>? len = name?.<span class="prop">length</span>;
+
+<span class="cm">// 非空断言（确定不为 null 时）</span>
+<span class="type">String</span> n = name<span class="op">!</span>;
+
+<span class="cm">// 空值赋值</span>
+name ??= <span class="str">'unknown'</span>;
+
+<span class="cm">// 延迟初始化</span>
+<span class="kw">late</span> <span class="type">String</span> token;
+<span class="cm">// 用之前必须赋值，否则运行时报错</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 类 & 构造函数 -->
+<section class="section reveal" id="class-constructor">
+  <div class="section-header">
+    <span class="section-number">05</span>
+    <h2 class="section-title">类 & 构造函数</h2>
+  </div>
+  <p class="section-desc">Dart 的类系统对 Java 开发者来说非常亲切。但多了命名构造函数、初始化列表、factory 等语法糖，写起来更简洁。</p>
+
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-col-header java"><span class="icon">J</span> Java</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag java-tag">JAVA</span></div>
+<pre><span class="kw">public class</span> <span class="type">User</span> {
+  <span class="kw">private final</span> <span class="type">String</span> name;
+  <span class="kw">private final</span> <span class="type">int</span> age;
+
+  <span class="cm">// 构造函数</span>
+  <span class="kw">public</span> <span class="fn">User</span>(<span class="type">String</span> name, <span class="type">int</span> age) {
+    <span class="kw">this</span>.name = name;
+    <span class="kw">this</span>.age = age;
+  }
+
+  <span class="cm">// 重载构造</span>
+  <span class="kw">public</span> <span class="fn">User</span>(<span class="type">String</span> name) {
+    <span class="kw">this</span>(name, <span class="num">0</span>);
+  }
+
+  <span class="cm">// 静态工厂方法</span>
+  <span class="kw">public static</span> <span class="type">User</span> <span class="fn">fromJson</span>(<span class="type">Map</span> json) {
+    <span class="kw">return new</span> <span class="fn">User</span>(
+      (<span class="type">String</span>)json.<span class="fn">get</span>(<span class="str">"name"</span>),
+      (<span class="type">int</span>)json.<span class="fn">get</span>(<span class="str">"age"</span>));
+  }
+
+  <span class="cm">// getter</span>
+  <span class="kw">public</span> <span class="type">String</span> <span class="fn">getName</span>() {
+    <span class="kw">return</span> name;
+  }
+}</pre>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header diff"><span class="icon">⇄</span> 差异说明</div>
+      <div style="padding:.5rem 0;font-size:.83rem;color:var(--text-secondary);line-height:1.9">
+        <p>Java 构造重载 → Dart <strong>命名构造函数</strong></p>
+        <p>Java <code>this.name = name</code> → Dart <code style="color:var(--accent-flutter)">this.name</code> 语法糖</p>
+        <p>Java 静态工厂 → Dart <code style="color:var(--accent-flutter)">User.fromJson()</code></p>
+        <p>Java getter → Dart <code style="color:var(--accent-flutter)">get</code> 关键字</p>
+        <p>Dart 有<strong>初始化列表</strong> <code style="color:var(--accent-flutter)">:</code></p>
+        <p>Dart <code style="color:var(--accent-flutter)">factory</code> = 工厂模式内置</p>
+        <p>Dart 没有 public/private 关键字，用 <code style="color:var(--accent-flutter)">_</code> 前缀表示私有</p>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header flutter"><span class="icon">D</span> Dart</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span></div>
+<pre><span class="kw">class</span> <span class="type">User</span> {
+  <span class="kw">final</span> <span class="type">String</span> name;
+  <span class="kw">final</span> <span class="type">int</span> age;
+
+  <span class="cm">// 语法糖：this.name 自动赋值</span>
+  <span class="type">User</span>(<span class="kw">this</span>.name, <span class="kw">this</span>.age);
+
+  <span class="cm">// 命名构造 + 初始化列表</span>
+  <span class="type">User</span>.<span class="fn">fromJson</span>(<span class="type">Map</span> json)
+    : name = json[<span class="str">'name'</span>],
+      age = json[<span class="str">'age'</span>];
+
+  <span class="cm">// 命名参数构造</span>
+  <span class="type">User</span>.<span class="fn">create</span>({
+    <span class="kw">required</span> <span class="kw">this</span>.name,
+    <span class="kw">this</span>.age = <span class="num">0</span>,
+  });
+
+  <span class="cm">// getter（不用写 getName）</span>
+  <span class="type">String</span> <span class="kw">get</span> <span class="fn">displayName</span> <span class="op">=></span>
+    <span class="str">'$name ($age)'</span>;
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <h3><span class="emoji">🏭</span> factory 构造 = 单例模式内置</h3>
+    <p>Java 写单例需要 private 构造 + static getInstance()。Dart 用 <code>factory</code> 一行搞定。</p>
+    <div class="two-col" style="margin-top:.75rem">
+      <div class="code-block"><div class="code-header"><span class="lang-tag java-tag">JAVA</span>Java 单例</div>
+<pre><span class="kw">public class</span> <span class="type">HttpManager</span> {
+  <span class="kw">private static final</span> <span class="type">HttpManager</span>
+    INSTANCE = <span class="kw">new</span> <span class="fn">HttpManager</span>();
+
+  <span class="kw">private</span> <span class="fn">HttpManager</span>() { }
+
+  <span class="kw">public static</span> <span class="type">HttpManager</span> <span class="fn">getInstance</span>() {
+    <span class="kw">return</span> INSTANCE;
+  }
+}</pre>
+      </div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span>Dart 单例</div>
+<pre><span class="kw">class</span> <span class="type">HttpManager</span> {
+  <span class="kw">static final</span> <span class="type">HttpManager</span> _instance =
+    <span class="type">HttpManager</span>.<span class="fn">_internal</span>();
+
+  <span class="kw">factory</span> <span class="fn">HttpManager</span>() <span class="op">=></span> _instance;
+
+  <span class="type">HttpManager</span>.<span class="fn">_internal</span>() {
+    <span class="cm">// 初始化 Dio...</span>
+  }
+}</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 参数系统 -->
+<section class="section reveal" id="params">
+  <div class="section-header">
+    <span class="section-number">06</span>
+    <h2 class="section-title">参数系统 — 告别 Builder 模式</h2>
+  </div>
+  <p class="section-desc">Java 没有命名参数，复杂对象要用 Builder 模式。Dart 原生支持命名参数，这就是为什么 Flutter Widget 写起来像 Builder 但不用写 Builder 类。</p>
+
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-col-header java"><span class="icon">J</span> Java</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag java-tag">JAVA</span></div>
+<pre><span class="cm">// 只有位置参数</span>
+<span class="kw">public</span> <span class="type">void</span> <span class="fn">greet</span>(<span class="type">String</span> name, <span class="type">int</span> age) {}
+<span class="fn">greet</span>(<span class="str">"Tom"</span>, <span class="num">25</span>);
+
+<span class="cm">// 复杂对象 → Builder 模式</span>
+<span class="type">User</span> user = <span class="type">User</span>.<span class="fn">builder</span>()
+  .<span class="fn">name</span>(<span class="str">"Tom"</span>)
+  .<span class="fn">age</span>(<span class="num">25</span>)
+  .<span class="fn">email</span>(<span class="str">"tom@test.com"</span>)
+  .<span class="fn">build</span>();
+
+<span class="cm">// 方法重载模拟可选参数</span>
+<span class="kw">public</span> <span class="type">void</span> <span class="fn">log</span>(<span class="type">String</span> msg) {
+  <span class="fn">log</span>(msg, <span class="num">0</span>);
+}
+<span class="kw">public</span> <span class="type">void</span> <span class="fn">log</span>(<span class="type">String</span> msg, <span class="type">int</span> level) {}</pre>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header diff"><span class="icon">⇄</span> 差异说明</div>
+      <div style="padding:.5rem 0;font-size:.83rem;color:var(--text-secondary);line-height:1.9">
+        <p>Dart <code style="color:var(--accent-flutter)">{}</code> = 命名参数（内置 Builder）</p>
+        <p>Dart <code style="color:var(--accent-flutter)">[]</code> = 可选位置参数</p>
+        <p><code style="color:var(--accent-flutter)">required</code> 标记必传</p>
+        <p>不用写 Builder 类，不用方法重载</p>
+        <p>Widget 属性全是命名参数</p>
+        <p>这就是 <code style="color:var(--accent-flutter)">Container(padding: ..., color: ...)</code> 的由来</p>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header flutter"><span class="icon">D</span> Dart</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span></div>
+<pre><span class="cm">// 命名参数 — {} 包裹</span>
+<span class="type">void</span> <span class="fn">createUser</span>({
+  <span class="kw">required</span> <span class="type">String</span> name,
+  <span class="type">int</span> age = <span class="num">0</span>,
+  <span class="type">String</span>? email,
+}) { }
+
+<span class="fn">createUser</span>(
+  <span class="prop">name</span>: <span class="str">'Tom'</span>,
+  <span class="prop">age</span>: <span class="num">25</span>,
+  <span class="prop">email</span>: <span class="str">'tom@test.com'</span>,
+);
+
+<span class="cm">// 可选位置参数 — [] 包裹</span>
+<span class="type">void</span> <span class="fn">log</span>(<span class="type">String</span> msg, [<span class="type">int</span> level = <span class="num">0</span>]) {}
+<span class="fn">log</span>(<span class="str">'hello'</span>);
+<span class="fn">log</span>(<span class="str">'hello'</span>, <span class="num">2</span>);</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 07 集合操作 -->
+<section class="section reveal" id="collection">
+  <div class="section-header">
+    <span class="section-number">07</span>
+    <h2 class="section-title">集合操作 — Stream API vs Dart 链式</h2>
+  </div>
+  <p class="section-desc">Java 8 的 Stream API 你肯定很熟。Dart 的集合操作和它非常像，但不需要 <code>.stream()</code> 开头。</p>
+
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-col-header java"><span class="icon">J</span> Java</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag java-tag">JAVA</span></div>
+<pre><span class="type">List</span>&lt;<span class="type">Integer</span>&gt; list = <span class="type">List</span>.<span class="fn">of</span>(<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>,<span class="num">5</span>);
+
+<span class="cm">// map</span>
+<span class="kw">var</span> doubled = list.<span class="fn">stream</span>()
+  .<span class="fn">map</span>(x <span class="op">-></span> x * <span class="num">2</span>)
+  .<span class="fn">toList</span>();
+
+<span class="cm">// filter</span>
+<span class="kw">var</span> filtered = list.<span class="fn">stream</span>()
+  .<span class="fn">filter</span>(x <span class="op">-></span> x > <span class="num">2</span>)
+  .<span class="fn">toList</span>();
+
+<span class="cm">// find</span>
+<span class="kw">var</span> first = list.<span class="fn">stream</span>()
+  .<span class="fn">filter</span>(x <span class="op">-></span> x > <span class="num">3</span>)
+  .<span class="fn">findFirst</span>().<span class="fn">orElse</span>(<span class="num">0</span>);
+
+<span class="cm">// Map</span>
+<span class="type">Map</span>&lt;<span class="type">String</span>,<span class="type">String</span>&gt; map = <span class="type">Map</span>.<span class="fn">of</span>(
+  <span class="str">"name"</span>, <span class="str">"Tom"</span>);
+map.<span class="fn">get</span>(<span class="str">"name"</span>);
+map.<span class="fn">containsKey</span>(<span class="str">"name"</span>);</pre>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header diff"><span class="icon">⇄</span> 差异说明</div>
+      <div style="padding:.5rem 0;font-size:.83rem;color:var(--text-secondary);line-height:1.9">
+        <p>Dart 不需要 <code>.stream()</code> 开头</p>
+        <p>Java <code>filter</code> → Dart <code style="color:var(--accent-flutter)">where</code></p>
+        <p>Java <code>findFirst</code> → Dart <code style="color:var(--accent-flutter)">firstWhere</code></p>
+        <p>都需要 <code style="color:var(--accent-flutter)">.toList()</code> 收集结果</p>
+        <p>Dart Map 用 <code style="color:var(--accent-flutter)">map['key']</code> 访问（像数组下标）</p>
+        <p>删除用 <code style="color:var(--accent-flutter)">removeWhere</code>（类似 removeIf）</p>
+        <p>Dart 还有 <code style="color:var(--accent-flutter)">...spread</code> 运算符</p>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header flutter"><span class="icon">D</span> Dart</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span></div>
+<pre><span class="kw">var</span> list = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>];
+
+<span class="cm">// map — 不需要 .stream()</span>
+<span class="kw">var</span> doubled = list
+  .<span class="fn">map</span>((e) <span class="op">=></span> e * <span class="num">2</span>)
+  .<span class="fn">toList</span>();
+
+<span class="cm">// where ≈ filter</span>
+<span class="kw">var</span> filtered = list
+  .<span class="fn">where</span>((e) <span class="op">=></span> e > <span class="num">2</span>)
+  .<span class="fn">toList</span>();
+
+<span class="cm">// firstWhere ≈ findFirst</span>
+<span class="kw">var</span> first = list
+  .<span class="fn">firstWhere</span>((e) <span class="op">=></span> e > <span class="num">3</span>,
+    <span class="prop">orElse</span>: () <span class="op">=></span> <span class="num">0</span>);
+
+<span class="cm">// Map</span>
+<span class="kw">var</span> map = {<span class="str">'name'</span>: <span class="str">'Tom'</span>};
+map[<span class="str">'name'</span>];
+map.<span class="fn">containsKey</span>(<span class="str">'name'</span>);</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 08 异步模型 -->
+<section class="section reveal" id="async">
+  <div class="section-header">
+    <span class="section-number">08</span>
+    <h2 class="section-title">异步模型 — CompletableFuture vs Future</h2>
+  </div>
+  <p class="section-desc">Java 的异步用 CompletableFuture + thenApply 链式调用，写起来比较啰嗦。Dart 有 async/await，和写同步代码一样直观。</p>
+
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-col-header java"><span class="icon">J</span> Java</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag java-tag">JAVA</span></div>
+<pre><span class="cm">// CompletableFuture</span>
+<span class="type">CompletableFuture</span>&lt;<span class="type">User</span>&gt; future =
+  <span class="type">CompletableFuture</span>.<span class="fn">supplyAsync</span>(() <span class="op">-></span>
+    restTemplate.<span class="fn">getForObject</span>(url, <span class="type">User</span>.<span class="kw">class</span>)
+  );
+
+<span class="cm">// 链式处理</span>
+future.<span class="fn">thenApply</span>(user <span class="op">-></span> user.<span class="fn">getName</span>())
+  .<span class="fn">thenAccept</span>(name <span class="op">-></span> log.<span class="fn">info</span>(name));
+
+<span class="cm">// 并发</span>
+<span class="type">CompletableFuture</span>.<span class="fn">allOf</span>(futureA, futureB)
+  .<span class="fn">join</span>();
+
+<span class="cm">// Reactor Flux（响应式流）</span>
+<span class="type">Flux</span>&lt;<span class="type">String</span>&gt; stream = webClient
+  .<span class="fn">get</span>().<span class="fn">retrieve</span>()
+  .<span class="fn">bodyToFlux</span>(<span class="type">String</span>.<span class="kw">class</span>);
+stream.<span class="fn">subscribe</span>(System.out::println);</pre>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header diff"><span class="icon">⇄</span> 差异说明</div>
+      <div style="padding:.5rem 0;font-size:.83rem;color:var(--text-secondary);line-height:1.9">
+        <p><code style="color:var(--accent-flutter)">Future</code> ≈ CompletableFuture</p>
+        <p><code style="color:var(--accent-flutter)">async/await</code> 让异步像同步一样写</p>
+        <p><code style="color:var(--accent-flutter)">Future.wait</code> ≈ CompletableFuture.allOf</p>
+        <p><code style="color:var(--accent-flutter)">Stream</code> ≈ Reactor Flux / RxJava Observable</p>
+        <p><code style="color:var(--accent-flutter)">.listen()</code> ≈ .subscribe()</p>
+        <p><code style="color:var(--accent-flutter)">async*</code> + <code style="color:var(--accent-flutter)">yield</code> 生成 Stream</p>
+        <p>AI 对话 SSE 就是典型 Stream 场景</p>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header flutter"><span class="icon">D</span> Dart</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span></div>
+<pre><span class="cm">// async/await — 写起来像同步</span>
+<span class="type">Future</span>&lt;<span class="type">User</span>&gt; <span class="fn">fetchUser</span>() <span class="kw">async</span> {
+  <span class="kw">final</span> res = <span class="kw">await</span> dio.<span class="fn">get</span>(url);
+  <span class="kw">return</span> <span class="type">User</span>.<span class="fn">fromJson</span>(res.data);
+}
+
+<span class="cm">// 链式（也支持，但不推荐）</span>
+<span class="fn">fetchUser</span>().<span class="fn">then</span>((user) <span class="op">=></span>
+  <span class="fn">print</span>(user.name));
+
+<span class="cm">// 并发</span>
+<span class="kw">final</span> results = <span class="kw">await</span> <span class="type">Future</span>.<span class="fn">wait</span>([
+  <span class="fn">fetchA</span>(), <span class="fn">fetchB</span>()
+]);
+
+<span class="cm">// Stream ≈ Flux</span>
+<span class="type">Stream</span>&lt;<span class="type">String</span>&gt; <span class="fn">sseStream</span>() <span class="kw">async*</span> {
+  <span class="kw">yield</span> <span class="str">'chunk1'</span>;
+  <span class="kw">yield</span> <span class="str">'chunk2'</span>;
+}
+stream.<span class="fn">listen</span>((data) <span class="op">=></span> <span class="fn">print</span>(data));</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 09 IoC & 依赖注入 -->
+<section class="section reveal" id="ioc">
+  <div class="section-header">
+    <span class="section-number">09</span>
+    <h2 class="section-title">IoC & 依赖注入 — Spring IoC vs GetX</h2>
+  </div>
+  <p class="section-desc">这是后端同学最容易理解的部分。GetX 的依赖注入和 Spring IoC 思路完全一致：注册 Bean → 获取 Bean。</p>
+
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-col-header spring"><span class="icon">S</span> Spring Boot</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag spring-tag">SPRING</span></div>
+<pre><span class="cm">// 注册 Bean</span>
+<span class="dec">@Service</span>
+<span class="kw">public class</span> <span class="type">UserService</span> { }
+
+<span class="dec">@Configuration</span>
+<span class="kw">public class</span> <span class="type">AppConfig</span> {
+  <span class="dec">@Bean</span>
+  <span class="kw">public</span> <span class="type">RestTemplate</span> <span class="fn">restTemplate</span>() {
+    <span class="kw">return new</span> <span class="fn">RestTemplate</span>();
+  }
+}
+
+<span class="cm">// 获取 Bean</span>
+<span class="dec">@Autowired</span>
+<span class="kw">private</span> <span class="type">UserService</span> userService;
+
+<span class="cm">// 懒加载</span>
+<span class="dec">@Lazy</span>
+<span class="dec">@Autowired</span>
+<span class="kw">private</span> <span class="type">HeavyService</span> heavyService;</pre>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header diff"><span class="icon">⇄</span> 差异说明</div>
+      <div style="padding:.5rem 0;font-size:.83rem;color:var(--text-secondary);line-height:1.9">
+        <p><code>@Service</code> → <code style="color:var(--accent-flutter)">Get.put()</code></p>
+        <p><code>@Bean</code> → <code style="color:var(--accent-flutter)">Get.put()</code></p>
+        <p><code>@Autowired</code> → <code style="color:var(--accent-flutter)">Get.find()</code></p>
+        <p><code>@Lazy</code> → <code style="color:var(--accent-flutter)">Get.lazyPut()</code></p>
+        <p>Spring 自动扫描 → GetX 手动注册</p>
+        <p>Spring 单例默认 → GetX 也是单例</p>
+        <p>思路完全一致，只是 API 不同</p>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header flutter"><span class="icon">D</span> Flutter + GetX</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span></div>
+<pre><span class="cm">// 注册（≈ @Service / @Bean）</span>
+Get.<span class="fn">put</span>(<span class="fn">UserController</span>());
+Get.<span class="fn">put</span>(<span class="fn">HttpManager</span>());
+
+<span class="cm">// 懒加载注册（≈ @Lazy）</span>
+Get.<span class="fn">lazyPut</span>(() <span class="op">=></span> <span class="fn">HeavyService</span>());
+
+<span class="cm">// 获取（≈ @Autowired）</span>
+<span class="kw">final</span> ctrl = Get.<span class="fn">find</span>&lt;<span class="type">UserController</span>&gt;();
+
+<span class="cm">// 在 GetPage 路由中自动绑定</span>
+<span class="fn">GetPage</span>(
+  <span class="prop">name</span>: <span class="str">'/user'</span>,
+  <span class="prop">page</span>: () <span class="op">=></span> <span class="fn">UserPage</span>(),
+  <span class="prop">binding</span>: <span class="fn">BindingsBuilder</span>(() {
+    Get.<span class="fn">lazyPut</span>(() <span class="op">=></span> <span class="fn">UserController</span>());
+  }),
+);</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 路由 -->
+<section class="section reveal" id="routing">
+  <div class="section-header">
+    <span class="section-number">10</span>
+    <h2 class="section-title">路由 — @RequestMapping vs GetPage</h2>
+  </div>
+
+  <div class="question-block">
+    <div class="q">Spring 的路由是注解映射，Flutter 的路由是什么？</div>
+    <div class="a">Flutter 用路由表映射 URL → Widget 页面，和 Spring 的 @RequestMapping 映射 URL → Controller 方法是同一个思路。实际项目推荐 GetX 的命名路由。</div>
+  </div>
+
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-col-header spring"><span class="icon">S</span> Spring Boot</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag spring-tag">SPRING</span></div>
+<pre><span class="dec">@RestController</span>
+<span class="kw">public class</span> <span class="type">PageController</span> {
+
+  <span class="dec">@GetMapping</span>(<span class="str">"/"</span>)
+  <span class="kw">public</span> <span class="type">String</span> <span class="fn">home</span>() {
+    <span class="kw">return</span> <span class="str">"home"</span>;
+  }
+
+  <span class="dec">@GetMapping</span>(<span class="str">"/detail/{id}"</span>)
+  <span class="kw">public</span> <span class="type">String</span> <span class="fn">detail</span>(
+    <span class="dec">@PathVariable</span> <span class="type">Long</span> id) {
+    <span class="kw">return</span> <span class="str">"detail"</span>;
+  }
+}
+
+<span class="cm">// 重定向</span>
+<span class="kw">return</span> <span class="str">"redirect:/home"</span>;</pre>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header diff"><span class="icon">⇄</span> 差异说明</div>
+      <div style="padding:.5rem 0;font-size:.83rem;color:var(--text-secondary);line-height:1.9">
+        <p>Spring: URL → Controller 方法</p>
+        <p>Flutter: URL → Widget 页面</p>
+        <p><code>@GetMapping</code> → <code style="color:var(--accent-flutter)">GetPage(name:)</code></p>
+        <p><code>@PathVariable</code> → <code style="color:var(--accent-flutter)">Get.arguments</code></p>
+        <p><code>redirect:</code> → <code style="color:var(--accent-flutter)">Get.offNamed()</code></p>
+        <p><code>forward:</code> → <code style="color:var(--accent-flutter)">Get.toNamed()</code></p>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header flutter"><span class="icon">D</span> Flutter + GetX</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span></div>
+<pre><span class="cm">// 路由表（≈ @RequestMapping）</span>
+<span class="fn">GetMaterialApp</span>(
+  <span class="prop">getPages</span>: [
+    <span class="fn">GetPage</span>(
+      <span class="prop">name</span>: <span class="str">'/'</span>,
+      <span class="prop">page</span>: () <span class="op">=></span> <span class="fn">HomePage</span>()),
+    <span class="fn">GetPage</span>(
+      <span class="prop">name</span>: <span class="str">'/detail'</span>,
+      <span class="prop">page</span>: () <span class="op">=></span> <span class="fn">DetailPage</span>()),
+  ],
+);
+
+<span class="cm">// 跳转（≈ forward）</span>
+Get.<span class="fn">toNamed</span>(<span class="str">'/detail'</span>,
+  <span class="prop">arguments</span>: {<span class="str">'id'</span>: <span class="num">123</span>});
+
+<span class="cm">// 替换（≈ redirect）</span>
+Get.<span class="fn">offNamed</span>(<span class="str">'/home'</span>);</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 11 网络请求 -->
+<section class="section reveal" id="http">
+  <div class="section-header">
+    <span class="section-number">11</span>
+    <h2 class="section-title">网络请求 — RestTemplate vs Dio</h2>
+  </div>
+
+  <div class="question-block">
+    <div class="q">后端用 RestTemplate / OkHttp / WebClient，Flutter 用什么？</div>
+    <div class="a">Flutter 用 <strong>Dio</strong>，功能 ≈ OkHttp + RestTemplate。支持拦截器、超时、FormData、文件上传下载、SSE 流式响应。封装方式和你在 Spring 中封装 RestTemplate 几乎一样。</div>
+  </div>
+
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-col-header spring"><span class="icon">S</span> Spring Boot</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag spring-tag">SPRING</span></div>
+<pre><span class="cm">// RestTemplate 配置</span>
+<span class="dec">@Bean</span>
+<span class="kw">public</span> <span class="type">RestTemplate</span> <span class="fn">restTemplate</span>() {
+  <span class="kw">var</span> rt = <span class="kw">new</span> <span class="fn">RestTemplate</span>();
+  rt.<span class="fn">setInterceptors</span>(<span class="type">List</span>.<span class="fn">of</span>(
+    (req, body, exec) <span class="op">-></span> {
+      req.<span class="fn">getHeaders</span>()
+        .<span class="fn">set</span>(<span class="str">"token"</span>, token);
+      <span class="kw">return</span> exec.<span class="fn">execute</span>(req, body);
+    }
+  ));
+  <span class="kw">return</span> rt;
+}
+
+<span class="cm">// 调用</span>
+<span class="type">User</span> user = restTemplate
+  .<span class="fn">getForObject</span>(url, <span class="type">User</span>.<span class="kw">class</span>);
+
+<span class="cm">// 错误处理</span>
+<span class="kw">try</span> {
+  restTemplate.<span class="fn">getForObject</span>(url);
+} <span class="kw">catch</span> (<span class="type">HttpClientErrorException</span> e) {
+  <span class="kw">if</span> (e.<span class="fn">getStatusCode</span>() == <span class="num">401</span>)
+    <span class="fn">logout</span>();
+}</pre>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header diff"><span class="icon">⇄</span> 差异说明</div>
+      <div style="padding:.5rem 0;font-size:.83rem;color:var(--text-secondary);line-height:1.9">
+        <p>Dio ≈ OkHttp + RestTemplate</p>
+        <p>拦截器思路完全一致</p>
+        <p>Spring <code>@Bean</code> 配置 → Dio 单例封装</p>
+        <p>Spring 拦截器 → Dio <code style="color:var(--accent-flutter)">InterceptorsWrapper</code></p>
+        <p>HttpClientErrorException → <code style="color:var(--accent-flutter)">DioException</code></p>
+        <p>超时用 <code style="color:var(--accent-flutter)">Duration</code> 对象</p>
+        <p>支持 SSE 流式响应（AI 对话）</p>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header flutter"><span class="icon">D</span> Dio (Flutter)</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span></div>
+<pre><span class="cm">// Dio 配置（≈ @Bean RestTemplate）</span>
+<span class="kw">final</span> _dio = <span class="fn">Dio</span>(<span class="fn">BaseOptions</span>(
+  <span class="prop">baseUrl</span>: <span class="str">'https://api.xxx.com'</span>,
+  <span class="prop">connectTimeout</span>:
+    <span class="fn">Duration</span>(<span class="prop">seconds</span>: <span class="num">10</span>),
+));
+
+<span class="cm">// 拦截器（≈ Spring Interceptor）</span>
+_dio.interceptors.<span class="fn">add</span>(
+  <span class="fn">InterceptorsWrapper</span>(
+    <span class="prop">onRequest</span>: (options, handler) {
+      options.headers[<span class="str">'token'</span>] = token;
+      handler.<span class="fn">next</span>(options);
+    },
+    <span class="prop">onError</span>: (e, handler) {
+      <span class="kw">if</span> (e.response?.statusCode == <span class="num">401</span>)
+        <span class="fn">logout</span>();
+      handler.<span class="fn">next</span>(e);
+    },
+  ),
+);
+
+<span class="cm">// 调用</span>
+<span class="kw">final</span> res = <span class="kw">await</span> _dio.<span class="fn">get</span>(<span class="str">'/users'</span>);</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 12 状态管理 -->
+<section class="section reveal" id="state">
+  <div class="section-header">
+    <span class="section-number">12</span>
+    <h2 class="section-title">状态管理 — @Service 的前端版</h2>
+  </div>
+  <p class="section-desc">后端没有"响应式 UI"的概念，但你可以这样理解：GetxController ≈ @Service（管理业务逻辑），<code>.obs</code> 变量 ≈ 自动通知前端刷新的字段。</p>
+
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-col-header spring"><span class="icon">S</span> Spring Boot 类比</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag spring-tag">SPRING</span>类比理解</div>
+<pre><span class="cm">// GetxController ≈ @Service</span>
+<span class="dec">@Service</span>
+<span class="kw">public class</span> <span class="type">UserService</span> {
+  <span class="cm">// 状态字段</span>
+  <span class="kw">private</span> <span class="type">boolean</span> loading = <span class="kw">false</span>;
+  <span class="kw">private</span> <span class="type">List</span>&lt;<span class="type">User</span>&gt; userList;
+  <span class="kw">private</span> <span class="type">String</span> errorMsg = <span class="str">""</span>;
+
+  <span class="cm">// ≈ onInit 生命周期</span>
+  <span class="dec">@PostConstruct</span>
+  <span class="kw">public</span> <span class="type">void</span> <span class="fn">init</span>() {
+    <span class="fn">fetchUserList</span>();
+  }
+
+  <span class="kw">public</span> <span class="type">void</span> <span class="fn">fetchUserList</span>() {
+    loading = <span class="kw">true</span>;
+    <span class="kw">try</span> {
+      userList = restTemplate
+        .<span class="fn">getForObject</span>(url);
+    } <span class="kw">catch</span> (<span class="type">Exception</span> e) {
+      errorMsg = e.<span class="fn">getMessage</span>();
+    } <span class="kw">finally</span> {
+      loading = <span class="kw">false</span>;
+    }
+  }
+}
+<span class="cm">// 但 Spring 不会自动通知 UI 刷新</span>
+<span class="cm">// GetX 的 .obs 会自动通知！</span></pre>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header diff"><span class="icon">⇄</span> 差异说明</div>
+      <div style="padding:.5rem 0;font-size:.83rem;color:var(--text-secondary);line-height:1.9">
+        <p><code>@Service</code> → <code style="color:var(--accent-flutter)">extends GetxController</code></p>
+        <p><code>@PostConstruct</code> → <code style="color:var(--accent-flutter)">onInit()</code></p>
+        <p>普通字段 → <code style="color:var(--accent-flutter)">.obs</code> 响应式变量</p>
+        <p>手动返回数据 → <code style="color:var(--accent-flutter)">Obx()</code> 自动刷新 UI</p>
+        <p><code>@Autowired</code> → <code style="color:var(--accent-flutter)">Get.find()</code></p>
+        <p>核心区别：GetX 会自动通知 UI 更新</p>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header flutter"><span class="icon">D</span> Flutter + GetX</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span></div>
+<pre><span class="kw">class</span> <span class="type">UserController</span> <span class="kw">extends</span> <span class="type">GetxController</span> {
+  <span class="cm">// .obs = 响应式（改了自动刷新 UI）</span>
+  <span class="kw">final</span> isLoading = <span class="kw">false</span>.<span class="prop">obs</span>;
+  <span class="kw">final</span> userList = &lt;<span class="type">Map</span>&gt;[].<span class="prop">obs</span>;
+  <span class="kw">final</span> errorMsg = <span class="str">''</span>.<span class="prop">obs</span>;
+
+  <span class="cm">// ≈ @PostConstruct</span>
+  <span class="dec">@override</span>
+  <span class="type">void</span> <span class="fn">onInit</span>() {
+    <span class="kw">super</span>.<span class="fn">onInit</span>();
+    <span class="fn">fetchUserList</span>();
+  }
+
+  <span class="type">Future</span>&lt;<span class="type">void</span>&gt; <span class="fn">fetchUserList</span>() <span class="kw">async</span> {
+    isLoading.<span class="prop">value</span> = <span class="kw">true</span>;
+    <span class="kw">try</span> {
+      <span class="kw">final</span> res = <span class="kw">await</span> dio.<span class="fn">get</span>(<span class="str">'/users'</span>);
+      userList.<span class="prop">value</span> = res.data;
+    } <span class="kw">on</span> <span class="type">DioException</span> <span class="kw">catch</span> (e) {
+      errorMsg.<span class="prop">value</span> = e.message ?? <span class="str">'失败'</span>;
+    } <span class="kw">finally</span> {
+      isLoading.<span class="prop">value</span> = <span class="kw">false</span>;
+    }
+  }
+}
+
+<span class="cm">// UI 中 — Obx 自动监听变化</span>
+<span class="fn">Obx</span>(() <span class="op">=></span> <span class="fn">Text</span>(<span class="str">'${ctrl.userList.length}'</span>))</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 13 UI 组件 -->
+<section class="section reveal" id="widgets">
+  <div class="section-header">
+    <span class="section-number">13</span>
+    <h2 class="section-title">UI 组件 — 万物皆 Widget</h2>
+  </div>
+  <p class="section-desc">后端同学可以这样理解：Flutter 的 Widget 就是一棵 Java 对象树。每个 UI 元素都是一个类的实例，通过构造函数的命名参数配置属性。</p>
+
+  <div class="question-block">
+    <div class="q">后端没写过前端 UI，怎么理解 Widget？</div>
+    <div class="a">想象你在 Java 中构建一棵树：<code>new Column(children: [new Text("Hello"), new Button("Click")])</code>。每个节点是一个对象，属性通过构造函数传入。Flutter 就是这样构建 UI 的 — 没有 HTML，没有 CSS，全是 Dart 对象。</div>
+  </div>
+
+  <div class="info-card">
+    <h3><span class="emoji">🧱</span> 常用 Widget 速查</h3>
+    <table class="mapping-table" style="margin-top:.75rem">
+      <thead><tr><th>UI 需求</th><th>Flutter Widget</th><th>Java 类比</th></tr></thead>
+      <tbody>
+        <tr><td>显示文本</td><td class="flutter-col">Text</td><td class="java-col">JLabel</td></tr>
+        <tr><td>按钮</td><td class="flutter-col">ElevatedButton / TextButton</td><td class="java-col">JButton</td></tr>
+        <tr><td>输入框</td><td class="flutter-col">TextField</td><td class="java-col">JTextField</td></tr>
+        <tr><td>图片</td><td class="flutter-col">Image</td><td class="java-col">ImageIcon</td></tr>
+        <tr><td>列表</td><td class="flutter-col">ListView</td><td class="java-col">JList</td></tr>
+        <tr><td>盒子容器</td><td class="flutter-col">Container</td><td class="java-col">JPanel</td></tr>
+        <tr><td>横向排列</td><td class="flutter-col">Row</td><td class="java-col">FlowLayout</td></tr>
+        <tr><td>纵向排列</td><td class="flutter-col">Column</td><td class="java-col">BoxLayout(Y)</td></tr>
+        <tr><td>层叠布局</td><td class="flutter-col">Stack</td><td class="java-col">LayeredPane</td></tr>
+        <tr><td>页面骨架</td><td class="flutter-col">Scaffold</td><td class="java-col">JFrame</td></tr>
+        <tr><td>弹框</td><td class="flutter-col">showDialog + AlertDialog</td><td class="java-col">JOptionPane</td></tr>
+        <tr><td>滚动区域</td><td class="flutter-col">SingleChildScrollView</td><td class="java-col">JScrollPane</td></tr>
+        <tr><td>间距</td><td class="flutter-col">SizedBox / Padding</td><td class="java-col">Box.createRigidArea</td></tr>
+        <tr><td>加载指示器</td><td class="flutter-col">CircularProgressIndicator</td><td class="java-col">JProgressBar</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="info-card">
+    <h3><span class="emoji">📝</span> Widget 代码示例 — 像写 Java 对象树</h3>
+    <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span>一个简单的卡片</div>
+<pre><span class="fn">Container</span>(
+  <span class="prop">padding</span>: <span class="fn">EdgeInsets</span>.<span class="fn">all</span>(<span class="num">16</span>),          <span class="cm">// ≈ setPadding</span>
+  <span class="prop">decoration</span>: <span class="fn">BoxDecoration</span>(
+    <span class="prop">color</span>: Colors.<span class="prop">white</span>,                <span class="cm">// ≈ setBackground</span>
+    <span class="prop">borderRadius</span>: <span class="fn">BorderRadius</span>.<span class="fn">circular</span>(<span class="num">12</span>),
+    <span class="prop">boxShadow</span>: [<span class="fn">BoxShadow</span>(
+      <span class="prop">color</span>: Colors.<span class="prop">black12</span>,
+      <span class="prop">blurRadius</span>: <span class="num">8</span>)],
+  ),
+  <span class="prop">child</span>: <span class="fn">Column</span>(                        <span class="cm">// ≈ BoxLayout(Y_AXIS)</span>
+    <span class="prop">children</span>: [
+      <span class="fn">Text</span>(<span class="str">'Hello'</span>,                     <span class="cm">// ≈ new JLabel("Hello")</span>
+        <span class="prop">style</span>: <span class="fn">TextStyle</span>(<span class="prop">fontSize</span>: <span class="num">20</span>, <span class="prop">fontWeight</span>: FontWeight.<span class="prop">bold</span>)),
+      <span class="fn">SizedBox</span>(<span class="prop">height</span>: <span class="num">8</span>),              <span class="cm">// ≈ Box.createRigidArea</span>
+      <span class="fn">Text</span>(<span class="str">'World'</span>),
+      <span class="fn">SizedBox</span>(<span class="prop">height</span>: <span class="num">16</span>),
+      <span class="fn">ElevatedButton</span>(                    <span class="cm">// ≈ new JButton("Click")</span>
+        <span class="prop">onPressed</span>: () <span class="op">=></span> <span class="fn">print</span>(<span class="str">'clicked'</span>),
+        <span class="prop">child</span>: <span class="fn">Text</span>(<span class="str">'Click Me'</span>)),
+    ],
+  ),
+)</pre>
+    </div>
+  </div>
+</section>
+
+<!-- 14 分层架构 -->
+<section class="section reveal" id="model">
+  <div class="section-header">
+    <span class="section-number">14</span>
+    <h2 class="section-title">分层架构 — Spring Boot vs Flutter</h2>
+  </div>
+  <p class="section-desc">这是后端同学最容易理解的部分。Flutter 的分层和 Spring Boot 几乎一一对应。</p>
+
+  <div class="arch-diagram">
+    <pre>
+  Spring Boot                          Flutter (GetX)
+┌──────────────────┐          ┌──────────────────────────┐
+│   Controller     │          │   Page (Widget)          │
+│   @RestController│          │   UI 展示层               │
+├──────────────────┤          ├──────────────────────────┤
+│   Service        │    ≈     │   GetxController         │
+│   @Service       │          │   业务逻辑 + 状态管理      │
+├──────────────────┤          ├──────────────────────────┤
+│   Repository     │          │   API Layer              │
+│   @Repository    │          │   Dio 请求封装            │
+├──────────────────┤          ├──────────────────────────┤
+│   Entity / DTO   │          │   Model / Entity         │
+│   数据模型        │          │   数据模型                │
+└──────────────────┘          └──────────────────────────┘</pre>
+    <div class="label">Spring Boot ↔ Flutter 分层映射</div>
+  </div>
+
+  <div class="info-card">
+    <h3><span class="emoji">🔗</span> 完整分层映射表</h3>
+    <table class="mapping-table" style="margin-top:.75rem">
+      <thead><tr><th>职责</th><th>Spring Boot</th><th>Flutter</th></tr></thead>
+      <tbody>
+        <tr><td>接口入口 / UI 展示</td><td class="java-col">@RestController</td><td class="flutter-col">Page (Widget)</td></tr>
+        <tr><td>业务逻辑</td><td class="java-col">@Service</td><td class="flutter-col">GetxController</td></tr>
+        <tr><td>数据访问 / 网络请求</td><td class="java-col">@Repository / RestTemplate</td><td class="flutter-col">API Layer (Dio)</td></tr>
+        <tr><td>数据库实体 / JSON 实体</td><td class="java-col">@Entity</td><td class="flutter-col">Entity (fromJson)</td></tr>
+        <tr><td>传输对象</td><td class="java-col">DTO / VO</td><td class="flutter-col">Model</td></tr>
+        <tr><td>依赖注入</td><td class="java-col">Spring IoC / @Autowired</td><td class="flutter-col">Get.put / Get.find</td></tr>
+        <tr><td>拦截器</td><td class="java-col">HandlerInterceptor</td><td class="flutter-col">Dio InterceptorsWrapper</td></tr>
+        <tr><td>全局状态</td><td class="java-col">ApplicationContext</td><td class="flutter-col">UserStateManager 单例</td></tr>
+        <tr><td>配置</td><td class="java-col">application.yml</td><td class="flutter-col">build_config.yaml</td></tr>
+        <tr><td>工具类</td><td class="java-col">util/</td><td class="flutter-col">utils/</td></tr>
+        <tr><td>入口</td><td class="java-col">Application.java</td><td class="flutter-col">main.dart</td></tr>
+        <tr><td>生命周期</td><td class="java-col">@PostConstruct / @PreDestroy</td><td class="flutter-col">onInit() / onClose()</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="info-card">
+    <h3><span class="emoji">📁</span> 项目目录对比</h3>
+    <div class="two-col" style="margin-top:.75rem">
+      <div class="code-block"><div class="code-header"><span class="lang-tag spring-tag">SPRING</span>src/main/java/</div>
+<pre>com.xxx.app/
+├── controller/   <span class="cm">// 接口入口</span>
+├── service/      <span class="cm">// 业务逻辑</span>
+├── repository/   <span class="cm">// 数据访问</span>
+├── entity/       <span class="cm">// 数据库实体</span>
+├── dto/          <span class="cm">// 传输对象</span>
+├── config/       <span class="cm">// 配置类</span>
+├── interceptor/  <span class="cm">// 拦截器</span>
+├── util/         <span class="cm">// 工具类</span>
+└── Application   <span class="cm">// 入口</span></pre>
+      </div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span>lib/</div>
+<pre>lib/
+├── api/          <span class="cm">// 接口端点（≈ controller）</span>
+├── common/
+│   ├── network/  <span class="cm">// Dio 封装（≈ config）</span>
+│   ├── state/    <span class="cm">// 全局状态</span>
+│   └── widget/   <span class="cm">// 公共组件</span>
+├── model/        <span class="cm">// 数据模型（≈ entity+dto）</span>
+├── utils/        <span class="cm">// 工具函数（≈ util）</span>
+├── mobile/page/  <span class="cm">// 手机页面</span>
+├── pad/page/     <span class="cm">// 平板页面</span>
+└── main.dart     <span class="cm">// 入口（≈ Application）</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <h3><span class="emoji">🚀</span> 启动流程对比</h3>
+    <div class="two-col" style="margin-top:.75rem">
+      <div class="code-block"><div class="code-header"><span class="lang-tag spring-tag">SPRING</span></div>
+<pre>Application.java
+├── SpringApplication.run()
+├── 自动扫描 @Component
+├── 加载 application.yml
+├── 初始化 Bean 容器
+├── 启动内嵌 Tomcat
+└── 监听端口，等待请求</pre>
+      </div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span></div>
+<pre>main.dart
+├── 检测平板/手机
+├── 设置屏幕方向
+├── InitializerUtil.initializeAll()
+│   ├── SharedPreferences
+│   ├── 加载环境配置
+│   └── 读取 token
+│       ├── 有 → 自动登录 → 首页
+│       └── 无 → 登录页
+└── runApp()</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 15 依赖生态 -->
+<section class="section reveal" id="deps">
+  <div class="section-header">
+    <span class="section-number">15</span>
+    <h2 class="section-title">依赖生态 — Maven ≈ pub.dev</h2>
+  </div>
+  <p class="section-desc">Java 用 Maven/Gradle 管理依赖，Flutter 用 pub.dev + pubspec.yaml。以下是常用依赖的对标关系。</p>
+
+  <table class="mapping-table">
+    <thead><tr><th>功能</th><th>Spring Boot (Maven)</th><th>Flutter (pub.dev)</th><th>版本</th></tr></thead>
+    <tbody>
+      <tr><td>HTTP 请求</td><td class="java-col">RestTemplate / OkHttp</td><td class="flutter-col">dio</td><td>^5.8.0</td></tr>
+      <tr><td>依赖注入</td><td class="java-col">Spring IoC</td><td class="flutter-col">get (GetX)</td><td>^4.7.2</td></tr>
+      <tr><td>路由</td><td class="java-col">@RequestMapping</td><td class="flutter-col">get (GetX)</td><td>^4.7.2</td></tr>
+      <tr><td>JSON 序列化</td><td class="java-col">Jackson / Gson</td><td class="flutter-col">json_serializable</td><td>^6.8.0</td></tr>
+      <tr><td>本地存储</td><td class="java-col">Redis / H2</td><td class="flutter-col">shared_preferences</td><td>^2.3.3</td></tr>
+      <tr><td>日志</td><td class="java-col">SLF4J / Logback</td><td class="flutter-col">logger</td><td>—</td></tr>
+      <tr><td>WebSocket</td><td class="java-col">Spring WebSocket</td><td class="flutter-col">web_socket_channel</td><td>^3.0.3</td></tr>
+      <tr><td>国际化</td><td class="java-col">MessageSource</td><td class="flutter-col">intl</td><td>0.19.0</td></tr>
+      <tr><td>文件上传</td><td class="java-col">MultipartFile</td><td class="flutter-col">flutter_oss_aliyun</td><td>^6.4.2</td></tr>
+      <tr><td>微信支付</td><td class="java-col">WxPay SDK</td><td class="flutter-col">fluwx</td><td>5.7.0</td></tr>
+      <tr><td>事件总线</td><td class="java-col">ApplicationEvent</td><td class="flutter-col">event_bus</td><td>^2.0.1</td></tr>
+      <tr><td>权限管理</td><td class="java-col">Spring Security</td><td class="flutter-col">permission_handler</td><td>^11.3.1</td></tr>
+      <tr><td>定时任务</td><td class="java-col">@Scheduled</td><td class="flutter-col">Timer / Future.delayed</td><td>内置</td></tr>
+      <tr><td>代码生成</td><td class="java-col">Lombok</td><td class="flutter-col">json_serializable + build_runner</td><td>—</td></tr>
+    </tbody>
+  </table>
+
+  <div class="dep-grid">
+    <div class="dep-card"><div class="dep-icon net">NET</div><div class="dep-info"><h5>dio ^5.8.0</h5><span>≈ OkHttp，拦截器/上传/SSE</span></div></div>
+    <div class="dep-card"><div class="dep-icon state">IOC</div><div class="dep-info"><h5>get ^4.7.2</h5><span>≈ Spring IoC + 路由 + 状态管理</span></div></div>
+    <div class="dep-card"><div class="dep-icon ui">UI</div><div class="dep-info"><h5>flutter_screenutil ^5.9.0</h5><span>屏幕适配（手机/平板）</span></div></div>
+    <div class="dep-card"><div class="dep-icon media">MDA</div><div class="dep-info"><h5>video_player + chewie</h5><span>视频播放器 + UI 封装</span></div></div>
+    <div class="dep-card"><div class="dep-icon file">FIL</div><div class="dep-info"><h5>flutter_oss_aliyun ^6.4.2</h5><span>≈ 阿里云 OSS SDK</span></div></div>
+    <div class="dep-card"><div class="dep-icon pay">PAY</div><div class="dep-info"><h5>fluwx 5.7.0</h5><span>≈ WxPay SDK 客户端版</span></div></div>
+  </div>
+</section>
+
+<!-- 16 多环境配置 -->
+<section class="section reveal" id="env">
+  <div class="section-header">
+    <span class="section-number">16</span>
+    <h2 class="section-title">多环境配置 — application.yml vs build_config.yaml</h2>
+  </div>
+
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-col-header spring"><span class="icon">S</span> Spring Boot</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag spring-tag">YAML</span>application.yml</div>
+<pre><span class="cm"># application-dev.yml</span>
+<span class="prop">server.port</span>: <span class="num">8080</span>
+<span class="prop">spring.datasource.url</span>:
+  <span class="str">jdbc:mysql://dev-db:3306/app</span>
+
+<span class="cm"># application-prod.yml</span>
+<span class="prop">server.port</span>: <span class="num">8080</span>
+<span class="prop">spring.datasource.url</span>:
+  <span class="str">jdbc:mysql://prod-db:3306/app</span>
+
+<span class="cm"># 启动指定环境</span>
+<span class="cm"># --spring.profiles.active=dev</span>
+
+<span class="cm"># 读取配置</span>
+<span class="dec">@Value</span>(<span class="str">"${server.port}"</span>)
+<span class="kw">private</span> <span class="type">int</span> port;</pre>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header diff"><span class="icon">⇄</span> 差异说明</div>
+      <div style="padding:.5rem 0;font-size:.83rem;color:var(--text-secondary);line-height:1.9">
+        <p>Spring <code>application-{env}.yml</code></p>
+        <p>Flutter <code style="color:var(--accent-flutter)">build_config.yaml</code></p>
+        <p><code>--spring.profiles.active</code> → 修改 yaml env 字段</p>
+        <p><code>@Value</code> → <code style="color:var(--accent-flutter)">SetApi.loadConfigFromYaml()</code></p>
+        <p>都是 YAML 格式，思路一致</p>
+        <p>Flutter 支持 test/uat/dev/release 四环境</p>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header flutter"><span class="icon">D</span> Flutter</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">YAML</span>build_config.yaml</div>
+<pre><span class="prop">env</span>: <span class="str">test</span>       <span class="cm"># test|uat|dev|release</span>
+<span class="prop">proxy</span>: <span class="kw">false</span>
+<span class="prop">proxyIP</span>: <span class="str">192.168.1.1</span>
+
+<span class="cm"># API 域名规则：</span>
+<span class="cm"># test    → api-test.xxx.cn</span>
+<span class="cm"># uat     → api-uat.xxx.cn</span>
+<span class="cm"># dev     → api-dev.xxx.cn</span>
+<span class="cm"># release → api.xxx.cn</span>
+
+<span class="cm">// 读取配置</span>
+<span class="cm">// SetApi.loadConfigFromYaml()</span>
+<span class="cm">// ≈ @Value + profiles.active</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="method-tags">
+    <span class="method-tag">📖 对比法学习</span>
+    <span class="method-tag">❓ 追问式学习</span>
+    <span class="method-tag">🤖 AI 辅助开发</span>
+    <span class="method-tag">☕ Java 后端视角</span>
+  </div>
+  <p>用你已有的 Java / Spring Boot 知识，快速掌握 Flutter 开发</p>
+  <p style="margin-top:.5rem;color:var(--text-muted)">Dart ≈ 简化版 Java + JS 的灵活性，不需要从零开始</p>
+</footer>
+
+</div>
+
+<script>
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+const sections = document.querySelectorAll('.section[id]');
+const navLinks = document.querySelectorAll('.nav-link');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(section => { const top = section.offsetTop - 120; if (scrollY >= top) current = section.getAttribute('id'); });
+  navLinks.forEach(link => { link.classList.toggle('active', link.getAttribute('href') === '#' + current); });
+});
+navLinks.forEach(link => {
+  link.addEventListener('click', () => { if (window.innerWidth <= 900) document.querySelector('.sidebar').classList.remove('open'); });
+});
+</script>
+</body>
+</html>

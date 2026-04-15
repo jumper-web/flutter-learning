@@ -1,0 +1,1685 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flutter 对比学习 — 前端开发者指南</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500;700;900&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-deep:#0a0e17;--bg-card:#111827;--bg-card-hover:#1a2332;--bg-code:#0d1117;
+  --accent-vue:#42b883;--accent-vue-dim:rgba(66,184,131,.12);
+  --accent-react:#61dafb;--accent-react-dim:rgba(97,218,251,.12);
+  --accent-flutter:#027DFD;--accent-flutter-dim:rgba(2,125,253,.12);
+  --accent-dart:#0175C2;
+  --text-primary:#e2e8f0;--text-secondary:#94a3b8;--text-muted:#64748b;
+  --border:rgba(255,255,255,.06);--border-active:rgba(255,255,255,.12);
+  --radius:16px;--radius-sm:10px;--sidebar-w:250px;
+  --font-mono:'JetBrains Mono','Fira Code',monospace;
+  --font-sans:'Noto Sans SC',-apple-system,sans-serif;
+  --font-display:'Playfair Display',serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-sans);background:var(--bg-deep);color:var(--text-primary);line-height:1.7;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:9999}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--text-muted);border-radius:3px}
+
+/* Sidebar */
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sidebar-w);background:rgba(10,14,23,.95);backdrop-filter:blur(20px) saturate(1.5);border-right:1px solid var(--border);z-index:200;display:flex;flex-direction:column;transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.sidebar-header{padding:1.5rem 1.25rem 1rem;border-bottom:1px solid var(--border);flex-shrink:0}
+.sidebar-logo{font-family:var(--font-mono);font-weight:600;font-size:.82rem;color:var(--accent-flutter);display:flex;align-items:center;gap:8px;margin-bottom:.4rem}
+.sidebar-logo .li{width:26px;height:26px;border-radius:7px;background:var(--accent-flutter-dim);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700}
+.sidebar-sub{font-size:.68rem;color:var(--text-muted);letter-spacing:.04em}
+.sidebar-nav{flex:1;overflow-y:auto;padding:.5rem 0;scrollbar-width:thin}
+.sidebar-nav::-webkit-scrollbar{width:3px}.sidebar-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+.nav-group{margin-bottom:.25rem}
+.nav-group-label{padding:8px 1.25rem 4px;font-size:.6rem;font-weight:600;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase}
+.nav-link{display:flex;align-items:center;gap:8px;padding:6px 1.25rem;color:var(--text-muted);text-decoration:none;font-size:.78rem;font-weight:500;border-left:2px solid transparent;transition:all .2s;cursor:pointer}
+.nav-link:hover{color:var(--text-primary);background:rgba(255,255,255,.03);border-left-color:rgba(255,255,255,.1)}
+.nav-link.active{color:var(--accent-flutter);background:var(--accent-flutter-dim);border-left-color:var(--accent-flutter)}
+.nav-link .nn{font-family:var(--font-mono);font-size:.6rem;color:var(--text-muted);min-width:18px}
+.sidebar-footer{padding:.75rem 1.25rem;border-top:1px solid var(--border);flex-shrink:0}
+.sidebar-tags{display:flex;flex-wrap:wrap;gap:5px}
+.stag{padding:2px 7px;border-radius:100px;font-size:.58rem;font-weight:600;border:1px solid}
+.stag.vue{color:var(--accent-vue);border-color:rgba(66,184,131,.3);background:var(--accent-vue-dim)}
+.stag.react{color:var(--accent-react);border-color:rgba(97,218,251,.3);background:var(--accent-react-dim)}
+.stag.flutter{color:var(--accent-flutter);border-color:rgba(2,125,253,.3);background:var(--accent-flutter-dim)}
+.sidebar-toggle{display:none;position:fixed;top:1rem;left:1rem;z-index:300;width:40px;height:40px;border-radius:10px;border:1px solid var(--border);background:rgba(10,14,23,.9);backdrop-filter:blur(10px);color:var(--text-primary);font-size:1.1rem;cursor:pointer;align-items:center;justify-content:center;transition:all .2s}
+.sidebar-toggle:hover{background:rgba(255,255,255,.05)}
+
+/* Main */
+.main-wrapper{margin-left:var(--sidebar-w);min-height:100vh}
+.hero{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 600px 400px at 30% 50%,rgba(66,184,131,.08),transparent),radial-gradient(ellipse 500px 500px at 70% 30%,rgba(97,218,251,.06),transparent),radial-gradient(ellipse 600px 400px at 50% 80%,rgba(2,125,253,.08),transparent);animation:heroPulse 8s ease-in-out infinite alternate}
+@keyframes heroPulse{0%{opacity:.7}100%{opacity:1}}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 60% at 50% 50%,black,transparent)}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:100px;border:1px solid var(--border-active);background:rgba(255,255,255,.03);font-size:.8rem;color:var(--text-secondary);letter-spacing:.05em;margin-bottom:2rem;backdrop-filter:blur(10px);animation:fadeInUp .8s ease-out}
+.hero-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--accent-vue);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.hero h1{font-family:var(--font-display);font-size:clamp(2.2rem,5vw,4.5rem);font-weight:700;line-height:1.1;margin-bottom:1.5rem;animation:fadeInUp .8s ease-out .1s both}
+.hero h1 .line1{color:var(--text-primary)}
+.hero h1 .line2{display:block;background:linear-gradient(135deg,var(--accent-vue),var(--accent-react),var(--accent-flutter));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-subtitle{font-size:1.05rem;color:var(--text-secondary);max-width:650px;margin-bottom:3rem;font-weight:300;animation:fadeInUp .8s ease-out .2s both}
+.hero-tags{display:flex;gap:.75rem;flex-wrap:wrap;justify-content:center;animation:fadeInUp .8s ease-out .3s both}
+.hero-tag{padding:10px 22px;border-radius:100px;font-size:.85rem;font-weight:500;letter-spacing:.02em;border:1px solid;transition:all .3s;cursor:default}
+.hero-tag.vue{color:var(--accent-vue);border-color:rgba(66,184,131,.3);background:var(--accent-vue-dim)}
+.hero-tag.react{color:var(--accent-react);border-color:rgba(97,218,251,.3);background:var(--accent-react-dim)}
+.hero-tag.flutter{color:var(--accent-flutter);border-color:rgba(2,125,253,.3);background:var(--accent-flutter-dim)}
+.hero-tag:hover{transform:translateY(-2px)}
+.scroll-hint{position:absolute;bottom:2rem;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--text-muted);font-size:.75rem;letter-spacing:.1em;animation:fadeInUp .8s ease-out .5s both}
+.scroll-hint .arrow{width:20px;height:30px;border:2px solid var(--text-muted);border-radius:10px;position:relative}
+.scroll-hint .arrow::after{content:'';position:absolute;top:6px;left:50%;transform:translateX(-50%);width:3px;height:6px;background:var(--text-muted);border-radius:2px;animation:scrollDown 1.5s ease-in-out infinite}
+@keyframes scrollDown{0%{transform:translateX(-50%) translateY(0);opacity:1}100%{transform:translateX(-50%) translateY(8px);opacity:0}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<style>
+/* Content */
+.content{max-width:1200px;margin:0 auto;padding:4rem 2rem 6rem}
+.section{margin-bottom:6rem;animation:fadeInUp .6s ease-out both}
+.section-header{display:flex;align-items:center;gap:1rem;margin-bottom:2.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+.section-number{font-family:var(--font-mono);font-size:.75rem;color:var(--accent-flutter);background:var(--accent-flutter-dim);padding:4px 10px;border-radius:6px;letter-spacing:.05em}
+.section-title{font-size:1.6rem;font-weight:700;letter-spacing:-.02em}
+.section-desc{color:var(--text-secondary);font-size:.95rem;margin-bottom:2rem;max-width:800px;line-height:1.8}
+
+/* Compare Grid (3 col) */
+.compare-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:2rem}
+.compare-col{background:var(--bg-card);padding:1.5rem;transition:background .3s}
+.compare-col:hover{background:var(--bg-card-hover)}
+.compare-col-header{display:flex;align-items:center;gap:8px;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:2px solid;font-weight:600;font-size:.85rem;letter-spacing:.02em}
+.compare-col-header.js{border-color:var(--accent-vue);color:var(--accent-vue)}
+.compare-col-header.ts{border-color:var(--accent-react);color:var(--accent-react)}
+.compare-col-header.vue{border-color:var(--accent-vue);color:var(--accent-vue)}
+.compare-col-header.react-h{border-color:var(--accent-react);color:var(--accent-react)}
+.compare-col-header.flutter{border-color:var(--accent-flutter);color:var(--accent-flutter)}
+.compare-col-header.diff{border-color:var(--text-muted);color:var(--text-secondary)}
+.compare-col-header.web{border-color:var(--accent-vue);color:var(--accent-vue)}
+.compare-col-header .icon{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-family:var(--font-mono);font-weight:700}
+.compare-col-header.js .icon{background:var(--accent-vue-dim)}
+.compare-col-header.ts .icon{background:var(--accent-react-dim)}
+.compare-col-header.vue .icon{background:var(--accent-vue-dim)}
+.compare-col-header.react-h .icon{background:var(--accent-react-dim)}
+.compare-col-header.flutter .icon{background:var(--accent-flutter-dim)}
+.compare-col-header.diff .icon{background:rgba(255,255,255,.05)}
+.compare-col-header.web .icon{background:var(--accent-vue-dim)}
+
+/* Code */
+.code-block{background:var(--bg-code);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin:.75rem 0}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:.7rem;color:var(--text-muted)}
+.code-header .lang-tag{padding:2px 8px;border-radius:4px;font-weight:600;letter-spacing:.05em}
+.code-header .lang-tag.js{background:rgba(66,184,131,.1);color:var(--accent-vue)}
+.code-header .lang-tag.jsx{background:rgba(97,218,251,.1);color:var(--accent-react)}
+.code-header .lang-tag.vue-tag{background:rgba(66,184,131,.1);color:var(--accent-vue)}
+.code-header .lang-tag.ts{background:rgba(97,218,251,.1);color:var(--accent-react)}
+.code-header .lang-tag.dart{background:rgba(2,125,253,.1);color:var(--accent-flutter)}
+.code-header .lang-tag.yaml{background:rgba(255,255,255,.05);color:var(--text-secondary)}
+.code-header .lang-tag.html-tag{background:rgba(66,184,131,.1);color:var(--accent-vue)}
+.code-header .lang-tag.css-tag{background:rgba(97,218,251,.1);color:var(--accent-react)}
+pre{padding:1rem 1.2rem;overflow-x:auto;font-family:var(--font-mono);font-size:.76rem;line-height:1.7;color:var(--text-primary);scrollbar-width:thin}
+pre::-webkit-scrollbar{height:4px}pre::-webkit-scrollbar-thumb{background:var(--text-muted);border-radius:2px}
+.kw{color:#c678dd}.fn{color:#61afef}.str{color:#98c379}.num{color:#d19a66}.cm{color:#5c6370;font-style:italic}.type{color:#e5c07b}.op{color:#56b6c2}.prop{color:#e06c75}.dec{color:#c678dd}.tag{color:#e06c75}.attr{color:#d19a66}
+
+/* Cards */
+.info-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.5rem;transition:all .3s}
+.info-card:hover{border-color:var(--border-active);transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.info-card h3{font-size:1.05rem;margin-bottom:.75rem;display:flex;align-items:center;gap:8px}
+.info-card h3 .emoji{font-size:1.2rem}
+.info-card p,.info-card li{color:var(--text-secondary);font-size:.88rem;line-height:1.8}
+.info-card ul{list-style:none;padding:0}
+.info-card ul li{padding:4px 0 4px 1.2rem;position:relative}
+.info-card ul li::before{content:'›';position:absolute;left:0;color:var(--accent-flutter);font-weight:700}
+
+/* Tables */
+.mapping-table{width:100%;border-collapse:separate;border-spacing:0;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);margin:1.5rem 0}
+.mapping-table th{background:rgba(255,255,255,.03);padding:12px 16px;text-align:left;font-size:.8rem;font-weight:600;color:var(--text-secondary);letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--border)}
+.mapping-table td{padding:10px 16px;font-size:.85rem;border-bottom:1px solid var(--border);color:var(--text-primary);transition:background .2s}
+.mapping-table tr:last-child td{border-bottom:none}
+.mapping-table tr:hover td{background:rgba(255,255,255,.02)}
+.mapping-table .web-col{font-family:var(--font-mono);font-size:.8rem;color:var(--accent-vue)}
+.mapping-table .flutter-col{font-family:var(--font-mono);font-size:.8rem;color:var(--accent-flutter)}
+.mapping-table .npm-col{font-family:var(--font-mono);font-size:.8rem;color:var(--accent-react)}
+
+/* Question */
+.question-block{background:linear-gradient(135deg,rgba(66,184,131,.05),rgba(2,125,253,.03));border:1px solid rgba(66,184,131,.15);border-radius:var(--radius);padding:1.5rem;margin:1.5rem 0;position:relative}
+.question-block::before{content:'?';position:absolute;top:-10px;left:20px;width:24px;height:24px;background:var(--accent-vue);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;font-family:var(--font-mono)}
+.question-block .q{font-weight:700;font-size:1rem;margin-bottom:.75rem;color:var(--text-primary)}
+.question-block .a{color:var(--text-secondary);font-size:.9rem;line-height:1.8}
+
+/* Arch */
+.arch-diagram{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;margin:2rem 0;text-align:center}
+.arch-diagram pre{display:inline-block;text-align:left;font-size:.72rem;color:var(--accent-flutter);line-height:1.6}
+.arch-diagram .label{font-size:.8rem;color:var(--text-muted);margin-top:1rem;font-style:italic}
+
+/* Roadmap */
+.roadmap{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem;margin:2rem 0}
+.roadmap-step{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;transition:all .3s}
+.roadmap-step:hover{border-color:var(--accent-flutter);box-shadow:0 0 40px rgba(2,125,253,.15);transform:translateY(-3px)}
+.roadmap-step .step-num{font-family:var(--font-display);font-size:2.5rem;font-weight:700;color:rgba(66,184,131,.15);line-height:1;margin-bottom:.5rem}
+.roadmap-step h4{font-size:1rem;margin-bottom:.5rem}
+.roadmap-step p{color:var(--text-secondary);font-size:.85rem;line-height:1.7}
+
+/* Two col */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0}
+
+/* Dep */
+.dep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;margin:1.5rem 0}
+.dep-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.2rem;display:flex;align-items:center;gap:1rem;transition:all .2s}
+.dep-card:hover{border-color:var(--border-active);background:var(--bg-card-hover)}
+.dep-card .dep-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-family:var(--font-mono);font-weight:700;flex-shrink:0}
+.dep-card .dep-icon.net{background:rgba(2,125,253,.12);color:var(--accent-flutter)}
+.dep-card .dep-icon.state{background:rgba(131,51,255,.12);color:#8333ff}
+.dep-card .dep-icon.ui{background:rgba(66,184,131,.12);color:var(--accent-vue)}
+.dep-card .dep-icon.media{background:rgba(247,223,30,.12);color:#f7df1e}
+.dep-card .dep-icon.file{background:rgba(225,112,85,.12);color:#e17055}
+.dep-card .dep-icon.pay{background:rgba(253,121,168,.12);color:#fd79a8}
+.dep-card .dep-info h5{font-size:.85rem;font-family:var(--font-mono);margin-bottom:2px}
+.dep-card .dep-info span{font-size:.75rem;color:var(--text-muted)}
+
+/* Footer */
+.footer{text-align:center;padding:4rem 2rem;color:var(--text-muted);font-size:.8rem;border-top:1px solid var(--border)}
+.footer .method-tags{display:flex;justify-content:center;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.footer .method-tag{padding:6px 16px;border-radius:100px;border:1px solid var(--border);font-size:.75rem;color:var(--text-secondary)}
+
+/* Responsive */
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}
+  .sidebar-toggle{display:flex}.main-wrapper{margin-left:0}
+  .compare-grid{grid-template-columns:1fr}.two-col{grid-template-columns:1fr}
+  .content{padding:2rem 1rem 4rem}
+}
+@media(max-width:600px){.hero h1{font-size:2rem}.hero-subtitle{font-size:.95rem}.roadmap{grid-template-columns:1fr}.dep-grid{grid-template-columns:1fr}}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+</style>
+<body>
+
+<button class="sidebar-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')" aria-label="Toggle menu">☰</button>
+
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo"><span class="li">F</span> flutter-guide</div>
+    <div class="sidebar-sub">对比法 &amp; 追问式学习</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label">概览</div>
+      <a class="nav-link" href="#roadmap"><span class="nn">01</span>学习路线</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">语法基础</div>
+      <a class="nav-link" href="#syntax"><span class="nn">02</span>语法对比</a>
+      <a class="nav-link" href="#null-safety"><span class="nn">03</span>空安全</a>
+      <a class="nav-link" href="#class-constructor"><span class="nn">04</span>类 &amp; 构造函数</a>
+      <a class="nav-link" href="#params"><span class="nn">05</span>参数系统</a>
+      <a class="nav-link" href="#cascade"><span class="nn">06</span>级联 &amp; 扩展</a>
+      <a class="nav-link" href="#async"><span class="nn">07</span>异步进阶</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">框架核心</div>
+      <a class="nav-link" href="#routing"><span class="nn">08</span>路由对比</a>
+      <a class="nav-link" href="#style-layout"><span class="nn">09</span>样式 &amp; 布局</a>
+      <a class="nav-link" href="#state"><span class="nn">10</span>状态管理</a>
+      <a class="nav-link" href="#http"><span class="nn">11</span>网络请求</a>
+      <a class="nav-link" href="#widgets"><span class="nn">12</span>Widget 体系</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">工程化</div>
+      <a class="nav-link" href="#model"><span class="nn">13</span>Model &amp; Controller</a>
+      <a class="nav-link" href="#arch"><span class="nn">14</span>项目架构</a>
+      <a class="nav-link" href="#deps"><span class="nn">15</span>依赖生态</a>
+      <a class="nav-link" href="#env"><span class="nn">16</span>多环境配置</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-tags">
+      <span class="stag vue">Vue</span>
+      <span class="stag react">React</span>
+      <span class="stag flutter">Flutter</span>
+    </div>
+  </div>
+</aside>
+
+<div class="main-wrapper">
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-badge"><span class="dot"></span>对比法 &amp; 追问式学习</div>
+  <h1>
+    <span class="line1">前端开发者的</span>
+    <span class="line2">Flutter 学习指南</span>
+  </h1>
+  <p class="hero-subtitle">
+    用你已经掌握的 Vue / React 知识，通过对比和追问，快速理解 Flutter 的开发范式
+  </p>
+  <div class="hero-tags">
+    <span class="hero-tag vue">Vue.js</span>
+    <span class="hero-tag react">React</span>
+    <span class="hero-tag flutter">Flutter / Dart</span>
+  </div>
+  <div class="scroll-hint"><div class="arrow"></div>SCROLL</div>
+</section>
+
+<main class="content">
+
+<!-- 01 学习路线 -->
+<section class="section reveal" id="roadmap">
+  <div class="section-header">
+    <span class="section-number">01</span>
+    <h2 class="section-title">学习路线</h2>
+  </div>
+  <p class="section-desc">你已经有组件化思维、响应式数据流、前端工程化经验。Dart 对你来说就是"TypeScript 的近亲 + 自带 UI 框架"。</p>
+  <div class="roadmap">
+    <div class="roadmap-step"><div class="step-num">01</div><h4>Dart 语法速通</h4><p>对标 JS/TS 语法：类型系统、const/final、箭头函数、async/await。你会发现 80% 的概念都是熟悉的。</p></div>
+    <div class="roadmap-step"><div class="step-num">02</div><h4>Widget 入门</h4><p>理解"万物皆 Widget" — 类似 Vue/React 的组件树，但没有 HTML/CSS，全靠 Dart 对象嵌套。跑一个小 Demo APP。</p></div>
+    <div class="roadmap-step"><div class="step-num">03</div><h4>架构映射</h4><p>把前端的 Page → Store → API 映射到 Flutter 的 Page → GetxController → API。思路完全一致。</p></div>
+    <div class="roadmap-step"><div class="step-num">04</div><h4>AI 辅助开发</h4><p>结合 AI 进行项目开发，不懂的直接问。不需要记住所有 Widget 属性，用到再查。</p></div>
+  </div>
+</section>
+
+<!-- 02 语法对比 -->
+<section class="section reveal" id="syntax">
+  <div class="section-header">
+    <span class="section-number">02</span>
+    <h2 class="section-title">语法对比 — Dart vs JavaScript / TypeScript</h2>
+  </div>
+  <p class="section-desc">Dart 的类型系统和 TypeScript 非常接近，都是强类型。主要区别在于 Dart 多了 <code>const</code>（编译时常量）和 <code>dynamic</code>（≈ any）。</p>
+
+  <h3 style="font-size:1.1rem;margin:0 0 1rem">变量与类型</h3>
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-col-header js"><span class="icon">JS</span> JavaScript / TypeScript</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag ts">TS</span></div>
+<pre><span class="kw">const</span> name: <span class="type">string</span> = <span class="str">"hello"</span>;  <span class="cm">// 不可重新赋值</span>
+<span class="kw">let</span> count: <span class="type">number</span> = <span class="num">0</span>;        <span class="cm">// 可重新赋值</span>
+<span class="kw">let</span> old = <span class="str">"legacy"</span>;            <span class="cm">// 类型推断</span>
+
+<span class="kw">const</span> API = <span class="str">"https://api.com"</span>; <span class="cm">// 运行时常量</span>
+
+<span class="kw">let</span> age: <span class="type">number</span> = <span class="num">25</span>;
+<span class="kw">let</span> data: <span class="type">any</span> = <span class="str">"anything"</span>;   <span class="cm">// 任意类型</span>
+
+<span class="cm">// 基本类型</span>
+<span class="type">number</span>, <span class="type">string</span>, <span class="type">boolean</span>
+<span class="type">Array</span>&lt;<span class="type">string</span>&gt;, <span class="type">Record</span>&lt;<span class="type">string</span>, <span class="type">any</span>&gt;</pre>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header diff"><span class="icon">⇄</span> 差异说明</div>
+      <div style="padding:.5rem 0;font-size:.83rem;color:var(--text-secondary);line-height:1.9">
+        <p>JS <code>const</code> ≈ Dart <code style="color:var(--accent-flutter)">final</code>（运行时常量）</p>
+        <p>JS 没有编译时常量 → Dart <code style="color:var(--accent-flutter)">const</code>（编译时常量）</p>
+        <p>JS <code>let</code> = Dart <code style="color:var(--accent-flutter)">var</code>（类型推断后可变）</p>
+        <p>TS <code>any</code> ≈ Dart <code style="color:var(--accent-flutter)">dynamic</code></p>
+        <p>JS <code>number</code> → Dart 分 <code style="color:var(--accent-flutter)">int</code> 和 <code style="color:var(--accent-flutter)">double</code></p>
+        <p>Dart 字符串用单引号 <code style="color:var(--accent-flutter)">'hello'</code></p>
+        <p>Dart 有字符串插值 <code style="color:var(--accent-flutter)">'$name'</code>（≈ 模板字符串）</p>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header flutter"><span class="icon">D</span> Dart</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span></div>
+<pre><span class="kw">final</span> <span class="type">String</span> name = <span class="str">'hello'</span>;  <span class="cm">// 运行时常量</span>
+<span class="type">int</span> count = <span class="num">0</span>;               <span class="cm">// 可重新赋值</span>
+<span class="kw">var</span> old = <span class="str">'legacy'</span>;          <span class="cm">// 类型推断，锁定</span>
+
+<span class="kw">const</span> <span class="type">String</span> API =           <span class="cm">// 编译时常量</span>
+  <span class="str">'https://api.com'</span>;
+
+<span class="type">int</span> age = <span class="num">25</span>;
+<span class="kw">dynamic</span> data = <span class="str">'anything'</span>;   <span class="cm">// 任意类型</span>
+
+<span class="cm">// 基本类型</span>
+<span class="type">int</span>, <span class="type">double</span>, <span class="type">bool</span>, <span class="type">String</span>
+<span class="type">List</span>&lt;<span class="type">String</span>&gt;, <span class="type">Map</span>&lt;<span class="type">String</span>,<span class="kw">dynamic</span>&gt;</pre>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="font-size:1.1rem;margin:2rem 0 1rem">函数 &amp; 箭头函数</h3>
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-col-header js"><span class="icon">JS</span> JavaScript / TypeScript</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag ts">TS</span></div>
+<pre><span class="cm">// 函数声明</span>
+<span class="kw">function</span> <span class="fn">add</span>(a: <span class="type">number</span>, b: <span class="type">number</span>): <span class="type">number</span> {
+  <span class="kw">return</span> a + b;
+}
+
+<span class="cm">// 箭头函数（可多行）</span>
+<span class="kw">const</span> <span class="fn">add</span> = (a: <span class="type">number</span>, b: <span class="type">number</span>) <span class="op">=></span> a + b;
+
+<span class="cm">// 回调</span>
+list.<span class="fn">forEach</span>((item) <span class="op">=></span> <span class="fn">console</span>.<span class="fn">log</span>(item));
+
+<span class="cm">// async/await</span>
+<span class="kw">async function</span> <span class="fn">fetchData</span>(): <span class="type">Promise</span>&lt;<span class="type">string</span>&gt; {
+  <span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(url);
+  <span class="kw">return</span> res.<span class="fn">json</span>();
+}</pre>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header diff"><span class="icon">⇄</span> 差异说明</div>
+      <div style="padding:.5rem 0;font-size:.83rem;color:var(--text-secondary);line-height:1.9">
+        <p>JS 箭头可多行 → Dart <code style="color:var(--accent-flutter)">=></code> 只能<strong>一行</strong></p>
+        <p>多行用 <code style="color:var(--accent-flutter)">{}</code> 函数体</p>
+        <p>JS <code>Promise</code> → Dart <code style="color:var(--accent-flutter)">Future</code></p>
+        <p>都有 <code style="color:var(--accent-flutter)">async/await</code>，写法几乎一样</p>
+        <p>Dart 函数需声明返回类型（TS 也推荐）</p>
+        <p>Dart 支持顶层函数（和 JS 一样）</p>
+        <p>Dart 函数是一等公民（和 JS 一样）</p>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header flutter"><span class="icon">D</span> Dart</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span></div>
+<pre><span class="cm">// 函数声明</span>
+<span class="type">int</span> <span class="fn">add</span>(<span class="type">int</span> a, <span class="type">int</span> b) {
+  <span class="kw">return</span> a + b;
+}
+
+<span class="cm">// 箭头函数（仅一行）</span>
+<span class="type">int</span> <span class="fn">add</span>(<span class="type">int</span> a, <span class="type">int</span> b) <span class="op">=></span> a + b;
+
+<span class="cm">// 回调</span>
+list.<span class="fn">forEach</span>((item) <span class="op">=></span> <span class="fn">print</span>(item));
+
+<span class="cm">// async/await — 和 JS 几乎一样</span>
+<span class="type">Future</span>&lt;<span class="type">String</span>&gt; <span class="fn">fetchData</span>() <span class="kw">async</span> {
+  <span class="kw">final</span> res = <span class="kw">await</span> dio.<span class="fn">get</span>(url);
+  <span class="kw">return</span> res.data;
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="font-size:1.1rem;margin:2rem 0 1rem">List &amp; Map 操作</h3>
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-col-header js"><span class="icon">JS</span> JavaScript / TypeScript</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag ts">TS</span></div>
+<pre><span class="kw">const</span> list = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>];
+
+<span class="cm">// map</span>
+<span class="kw">const</span> doubled = list.<span class="fn">map</span>(x <span class="op">=></span> x * <span class="num">2</span>);
+
+<span class="cm">// filter</span>
+<span class="kw">const</span> filtered = list.<span class="fn">filter</span>(x <span class="op">=></span> x > <span class="num">2</span>);
+
+<span class="cm">// find</span>
+<span class="kw">const</span> found = list.<span class="fn">find</span>(x <span class="op">=></span> x > <span class="num">3</span>) ?? <span class="num">0</span>;
+
+<span class="cm">// Object / Map</span>
+<span class="kw">const</span> obj = { <span class="prop">name</span>: <span class="str">"Tom"</span> };
+obj.<span class="prop">name</span>;
+<span class="str">"name"</span> <span class="kw">in</span> obj;</pre>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header diff"><span class="icon">⇄</span> 差异说明</div>
+      <div style="padding:.5rem 0;font-size:.83rem;color:var(--text-secondary);line-height:1.9">
+        <p>JS <code>filter</code> → Dart <code style="color:var(--accent-flutter)">where</code></p>
+        <p>JS <code>find</code> → Dart <code style="color:var(--accent-flutter)">firstWhere</code></p>
+        <p>JS <code>map</code> 返回数组 → Dart 返回 Iterable，需 <code style="color:var(--accent-flutter)">.toList()</code></p>
+        <p>JS 对象字面量 → Dart <code style="color:var(--accent-flutter)">Map</code></p>
+        <p>Dart Map 用 <code style="color:var(--accent-flutter)">map['key']</code> 访问</p>
+        <p>Dart 有 <code style="color:var(--accent-flutter)">...spread</code> 运算符（和 JS 一样）</p>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header flutter"><span class="icon">D</span> Dart</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span></div>
+<pre><span class="kw">var</span> list = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>];
+
+<span class="cm">// map — 需要 .toList()</span>
+<span class="kw">var</span> doubled = list
+  .<span class="fn">map</span>((e) <span class="op">=></span> e * <span class="num">2</span>).<span class="fn">toList</span>();
+
+<span class="cm">// where ≈ filter</span>
+<span class="kw">var</span> filtered = list
+  .<span class="fn">where</span>((e) <span class="op">=></span> e > <span class="num">2</span>).<span class="fn">toList</span>();
+
+<span class="cm">// firstWhere ≈ find</span>
+<span class="kw">var</span> found = list
+  .<span class="fn">firstWhere</span>((e) <span class="op">=></span> e > <span class="num">3</span>,
+    <span class="prop">orElse</span>: () <span class="op">=></span> <span class="num">0</span>);
+
+<span class="cm">// Map</span>
+<span class="kw">var</span> map = {<span class="str">'name'</span>: <span class="str">'Tom'</span>};
+map[<span class="str">'name'</span>];
+map.<span class="fn">containsKey</span>(<span class="str">'name'</span>);</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 空安全 -->
+<section class="section reveal" id="null-safety">
+  <div class="section-header">
+    <span class="section-number">03</span>
+    <h2 class="section-title">空安全 — Dart 的 Null Safety</h2>
+  </div>
+  <p class="section-desc">TypeScript 用 <code>?</code> 和 <code>??</code> 处理空值，Dart 的空安全和 TS 非常像，但更严格 — 编译器强制检查。</p>
+
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-col-header ts"><span class="icon">TS</span> TypeScript</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag ts">TS</span></div>
+<pre><span class="cm">// optional 类型</span>
+<span class="kw">let</span> name: <span class="type">string</span> | <span class="type">undefined</span>;
+<span class="kw">let</span> title: <span class="type">string</span> = <span class="str">""</span>;
+
+<span class="cm">// nullish coalescing</span>
+<span class="kw">const</span> val = name ?? <span class="str">"default"</span>;
+
+<span class="cm">// optional chaining</span>
+<span class="kw">const</span> len = name?.<span class="prop">length</span>;
+
+<span class="cm">// non-null assertion</span>
+<span class="kw">const</span> n: <span class="type">string</span> = name<span class="op">!</span>;
+
+<span class="cm">// nullish assignment</span>
+name ??= <span class="str">"unknown"</span>;
+
+<span class="cm">// 接口可选属性</span>
+<span class="kw">interface</span> <span class="type">User</span> {
+  name: <span class="type">string</span>;
+  age?: <span class="type">number</span>;
+}</pre>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header diff"><span class="icon">⇄</span> 差异说明</div>
+      <div style="padding:.5rem 0;font-size:.83rem;color:var(--text-secondary);line-height:1.9">
+        <p>TS <code>string | undefined</code> → Dart <code style="color:var(--accent-flutter)">String?</code></p>
+        <p>TS <code>??</code> = Dart <code style="color:var(--accent-flutter)">??</code>（完全一样）</p>
+        <p>TS <code>?.</code> = Dart <code style="color:var(--accent-flutter)">?.</code>（完全一样）</p>
+        <p>TS <code>!</code> = Dart <code style="color:var(--accent-flutter)">!</code>（非空断言）</p>
+        <p>TS <code>??=</code> = Dart <code style="color:var(--accent-flutter)">??=</code>（完全一样）</p>
+        <p>Dart 多了 <code style="color:var(--accent-flutter)">late</code> 延迟初始化</p>
+        <p>Dart 默认不可 null，编译器强制检查</p>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header flutter"><span class="icon">D</span> Dart</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span></div>
+<pre><span class="cm">// 类型后加 ? 表示可空</span>
+<span class="type">String</span>? name;        <span class="cm">// 可以为 null</span>
+<span class="type">String</span> title = <span class="str">''</span>;   <span class="cm">// 不可为 null</span>
+
+<span class="cm">// 空值合并</span>
+<span class="type">String</span> val = name ?? <span class="str">'default'</span>;
+
+<span class="cm">// 可选链</span>
+<span class="type">int</span>? len = name?.<span class="prop">length</span>;
+
+<span class="cm">// 非空断言</span>
+<span class="type">String</span> n = name<span class="op">!</span>;
+
+<span class="cm">// 空值赋值</span>
+name ??= <span class="str">'unknown'</span>;
+
+<span class="cm">// 延迟初始化</span>
+<span class="kw">late</span> <span class="type">String</span> token;
+<span class="cm">// 用之前必须赋值，否则运行时报错</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <h3><span class="emoji">⏰</span> <code>late</code> 关键字 — TS 没有的概念</h3>
+    <p><code>late</code> 告诉编译器："这个变量我保证在使用前会赋值"。常用于 Controller 中需要在 <code>onInit()</code> 里初始化的字段。如果忘了赋值就使用，运行时会报 <code>LateInitializationError</code>。</p>
+    <div class="code-block" style="margin-top:.75rem"><div class="code-header"><span class="lang-tag dart">DART</span></div>
+<pre><span class="kw">class</span> <span class="type">UserController</span> <span class="kw">extends</span> <span class="type">GetxController</span> {
+  <span class="kw">late</span> <span class="type">String</span> token;  <span class="cm">// 声明时不赋值</span>
+
+  <span class="dec">@override</span>
+  <span class="type">void</span> <span class="fn">onInit</span>() {
+    <span class="kw">super</span>.<span class="fn">onInit</span>();
+    token = <span class="fn">getStoredToken</span>();  <span class="cm">// 初始化时赋值</span>
+  }
+}</pre>
+    </div>
+  </div>
+</section>
+
+<!-- 04 类 & 构造函数 -->
+<section class="section reveal" id="class-constructor">
+  <div class="section-header">
+    <span class="section-number">04</span>
+    <h2 class="section-title">类 &amp; 构造函数</h2>
+  </div>
+  <p class="section-desc">TS 的 class 语法和 Dart 非常接近。但 Dart 多了命名构造函数、初始化列表、factory 等语法糖，写起来更简洁。</p>
+
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-col-header ts"><span class="icon">TS</span> TypeScript</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag ts">TS</span></div>
+<pre><span class="kw">class</span> <span class="type">User</span> {
+  <span class="kw">readonly</span> name: <span class="type">string</span>;
+  <span class="kw">readonly</span> age: <span class="type">number</span>;
+
+  <span class="kw">constructor</span>(name: <span class="type">string</span>, age: <span class="type">number</span>) {
+    <span class="kw">this</span>.name = name;
+    <span class="kw">this</span>.age = age;
+  }
+
+  <span class="cm">// 静态工厂方法</span>
+  <span class="kw">static</span> <span class="fn">fromJson</span>(json: <span class="type">any</span>): <span class="type">User</span> {
+    <span class="kw">return new</span> <span class="fn">User</span>(json.name, json.age);
+  }
+
+  <span class="cm">// getter</span>
+  <span class="kw">get</span> <span class="fn">displayName</span>(): <span class="type">string</span> {
+    <span class="kw">return</span> <span class="str">`${<span class="kw">this</span>.name} (${<span class="kw">this</span>.age})`</span>;
+  }
+}</pre>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header diff"><span class="icon">⇄</span> 差异说明</div>
+      <div style="padding:.5rem 0;font-size:.83rem;color:var(--text-secondary);line-height:1.9">
+        <p>TS <code>constructor</code> → Dart <code style="color:var(--accent-flutter)">this.name</code> 语法糖</p>
+        <p>TS 只有一个 constructor → Dart 有<strong>命名构造函数</strong></p>
+        <p>TS <code>static fromJson</code> → Dart <code style="color:var(--accent-flutter)">User.fromJson()</code></p>
+        <p>TS <code>get</code> = Dart <code style="color:var(--accent-flutter)">get</code>（一样）</p>
+        <p>Dart 有<strong>初始化列表</strong> <code style="color:var(--accent-flutter)">:</code></p>
+        <p>Dart <code style="color:var(--accent-flutter)">factory</code> = 工厂模式内置</p>
+        <p>Dart 没有 public/private 关键字，用 <code style="color:var(--accent-flutter)">_</code> 前缀表示私有</p>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header flutter"><span class="icon">D</span> Dart</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span></div>
+<pre><span class="kw">class</span> <span class="type">User</span> {
+  <span class="kw">final</span> <span class="type">String</span> name;
+  <span class="kw">final</span> <span class="type">int</span> age;
+
+  <span class="cm">// 语法糖：this.name 自动赋值</span>
+  <span class="type">User</span>(<span class="kw">this</span>.name, <span class="kw">this</span>.age);
+
+  <span class="cm">// 命名构造 + 初始化列表</span>
+  <span class="type">User</span>.<span class="fn">fromJson</span>(<span class="type">Map</span> json)
+    : name = json[<span class="str">'name'</span>],
+      age = json[<span class="str">'age'</span>];
+
+  <span class="cm">// 命名参数构造</span>
+  <span class="type">User</span>.<span class="fn">create</span>({
+    <span class="kw">required</span> <span class="kw">this</span>.name,
+    <span class="kw">this</span>.age = <span class="num">0</span>,
+  });
+
+  <span class="cm">// getter</span>
+  <span class="type">String</span> <span class="kw">get</span> <span class="fn">displayName</span> <span class="op">=></span>
+    <span class="str">'$name ($age)'</span>;
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <h3><span class="emoji">🏭</span> factory 构造 = 单例模式内置</h3>
+    <p>JS/TS 写单例需要 private 构造 + static instance。Dart 用 <code>factory</code> 一行搞定。</p>
+    <div class="two-col" style="margin-top:.75rem">
+      <div class="code-block"><div class="code-header"><span class="lang-tag ts">TS</span>TypeScript 单例</div>
+<pre><span class="kw">class</span> <span class="type">HttpManager</span> {
+  <span class="kw">private static</span> instance: <span class="type">HttpManager</span>;
+
+  <span class="kw">private constructor</span>() { }
+
+  <span class="kw">static</span> <span class="fn">getInstance</span>(): <span class="type">HttpManager</span> {
+    <span class="kw">if</span> (!<span class="type">HttpManager</span>.instance) {
+      <span class="type">HttpManager</span>.instance =
+        <span class="kw">new</span> <span class="fn">HttpManager</span>();
+    }
+    <span class="kw">return</span> <span class="type">HttpManager</span>.instance;
+  }
+}</pre>
+      </div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span>Dart 单例</div>
+<pre><span class="kw">class</span> <span class="type">HttpManager</span> {
+  <span class="kw">static final</span> <span class="type">HttpManager</span> _instance =
+    <span class="type">HttpManager</span>.<span class="fn">_internal</span>();
+
+  <span class="kw">factory</span> <span class="fn">HttpManager</span>() <span class="op">=></span> _instance;
+
+  <span class="type">HttpManager</span>.<span class="fn">_internal</span>() {
+    <span class="cm">// 初始化 Dio...</span>
+  }
+}</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 参数系统 -->
+<section class="section reveal" id="params">
+  <div class="section-header">
+    <span class="section-number">05</span>
+    <h2 class="section-title">参数系统 — 命名参数 vs 位置参数</h2>
+  </div>
+  <p class="section-desc">JS 用对象解构模拟命名参数，Dart 原生支持命名参数。这就是为什么 Flutter Widget 写起来像 JSX 的 props 但不用写接口定义。</p>
+
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-col-header js"><span class="icon">JS</span> JavaScript / TypeScript</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag ts">TS</span></div>
+<pre><span class="cm">// 对象解构模拟命名参数</span>
+<span class="kw">function</span> <span class="fn">createUser</span>({
+  name,
+  age = <span class="num">0</span>,
+  email,
+}: {
+  name: <span class="type">string</span>;
+  age?: <span class="type">number</span>;
+  email?: <span class="type">string</span>;
+}) { }
+
+<span class="fn">createUser</span>({
+  <span class="prop">name</span>: <span class="str">"Tom"</span>,
+  <span class="prop">age</span>: <span class="num">25</span>,
+  <span class="prop">email</span>: <span class="str">"tom@test.com"</span>,
+});
+
+<span class="cm">// React props 也是对象解构</span>
+<span class="kw">function</span> <span class="fn">Button</span>({ label, onClick }: <span class="type">Props</span>) {
+  <span class="kw">return</span> &lt;<span class="tag">button</span> <span class="attr">onClick</span>={onClick}&gt;{label}&lt;/<span class="tag">button</span>&gt;;
+}</pre>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header diff"><span class="icon">⇄</span> 差异说明</div>
+      <div style="padding:.5rem 0;font-size:.83rem;color:var(--text-secondary);line-height:1.9">
+        <p>JS 解构 <code>{}</code> → Dart <code style="color:var(--accent-flutter)">{}</code> 命名参数</p>
+        <p>TS 需要定义接口 → Dart 直接在参数列表声明</p>
+        <p><code style="color:var(--accent-flutter)">required</code> 标记必传</p>
+        <p>Dart <code style="color:var(--accent-flutter)">[]</code> = 可选位置参数</p>
+        <p>React props ≈ Flutter Widget 命名参数</p>
+        <p>这就是 <code style="color:var(--accent-flutter)">Container(padding: ..., color: ...)</code> 的由来</p>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header flutter"><span class="icon">D</span> Dart</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span></div>
+<pre><span class="cm">// 命名参数 — {} 包裹</span>
+<span class="type">void</span> <span class="fn">createUser</span>({
+  <span class="kw">required</span> <span class="type">String</span> name,
+  <span class="type">int</span> age = <span class="num">0</span>,
+  <span class="type">String</span>? email,
+}) { }
+
+<span class="fn">createUser</span>(
+  <span class="prop">name</span>: <span class="str">'Tom'</span>,
+  <span class="prop">age</span>: <span class="num">25</span>,
+  <span class="prop">email</span>: <span class="str">'tom@test.com'</span>,
+);
+
+<span class="cm">// 可选位置参数 — [] 包裹</span>
+<span class="type">void</span> <span class="fn">log</span>(<span class="type">String</span> msg, [<span class="type">int</span> level = <span class="num">0</span>]) {}
+<span class="fn">log</span>(<span class="str">'hello'</span>);
+<span class="fn">log</span>(<span class="str">'hello'</span>, <span class="num">2</span>);</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="question-block">
+    <div class="q">为什么 Flutter Widget 全用 key: value 形式？</div>
+    <div class="a">因为 Widget 构造函数用的就是 Dart 的命名参数 <code>{}</code>。就像 React 的 <code>&lt;Button label="OK" onClick={fn} /&gt;</code>，Flutter 写成 <code>ElevatedButton(onPressed: fn, child: Text('OK'))</code>。本质一样，只是语法不同 — 一个是 JSX，一个是 Dart 构造函数。</div>
+  </div>
+</section>
+
+<!-- 06 级联操作符 & 扩展运算符 -->
+<section class="section reveal" id="cascade">
+  <div class="section-header">
+    <span class="section-number">06</span>
+    <h2 class="section-title">级联操作符 &amp; 扩展运算符</h2>
+  </div>
+  <p class="section-desc">JS 有 spread 运算符 <code>...</code>，Dart 也有。但 Dart 还多了一个级联操作符 <code>..</code>，可以对同一个对象连续调用方法。</p>
+
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-col-header js"><span class="icon">JS</span> JavaScript / TypeScript</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag ts">TS</span></div>
+<pre><span class="cm">// spread 运算符</span>
+<span class="kw">const</span> a = [<span class="num">1</span>, <span class="num">2</span>];
+<span class="kw">const</span> b = [...a, <span class="num">3</span>, <span class="num">4</span>];
+
+<span class="kw">const</span> obj1 = { <span class="prop">name</span>: <span class="str">"Tom"</span> };
+<span class="kw">const</span> obj2 = { ...obj1, <span class="prop">age</span>: <span class="num">25</span> };
+
+<span class="cm">// 链式调用（需要方法返回 this）</span>
+builder
+  .<span class="fn">setName</span>(<span class="str">"Tom"</span>)
+  .<span class="fn">setAge</span>(<span class="num">25</span>)
+  .<span class="fn">build</span>();
+
+<span class="cm">// 没有级联操作符</span>
+<span class="kw">const</span> list: <span class="type">number</span>[] = [];
+list.<span class="fn">push</span>(<span class="num">1</span>);
+list.<span class="fn">push</span>(<span class="num">2</span>);
+list.<span class="fn">push</span>(<span class="num">3</span>);</pre>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header diff"><span class="icon">⇄</span> 差异说明</div>
+      <div style="padding:.5rem 0;font-size:.83rem;color:var(--text-secondary);line-height:1.9">
+        <p>JS <code>...</code> spread = Dart <code style="color:var(--accent-flutter)">...</code>（数组/列表展开）</p>
+        <p>JS 对象 spread → Dart Map 也支持 <code style="color:var(--accent-flutter)">...</code></p>
+        <p>JS 没有级联 → Dart <code style="color:var(--accent-flutter)">..</code> 级联操作符</p>
+        <p><code style="color:var(--accent-flutter)">..</code> 不需要方法返回 this</p>
+        <p>级联常用于初始化对象后连续设置属性</p>
+        <p>Dart 还有 <code style="color:var(--accent-flutter)">?.</code> 空安全级联 <code style="color:var(--accent-flutter)">..</code></p>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header flutter"><span class="icon">D</span> Dart</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span></div>
+<pre><span class="cm">// spread 运算符（和 JS 一样）</span>
+<span class="kw">var</span> a = [<span class="num">1</span>, <span class="num">2</span>];
+<span class="kw">var</span> b = [...a, <span class="num">3</span>, <span class="num">4</span>];
+
+<span class="kw">var</span> map1 = {<span class="str">'name'</span>: <span class="str">'Tom'</span>};
+<span class="kw">var</span> map2 = {...map1, <span class="str">'age'</span>: <span class="num">25</span>};
+
+<span class="cm">// 级联操作符 .. （JS 没有）</span>
+<span class="kw">var</span> list = &lt;<span class="type">int</span>&gt;[]
+  ..<span class="fn">add</span>(<span class="num">1</span>)
+  ..<span class="fn">add</span>(<span class="num">2</span>)
+  ..<span class="fn">add</span>(<span class="num">3</span>);
+
+<span class="cm">// 常用于 Paint 等对象初始化</span>
+<span class="kw">var</span> paint = <span class="type">Paint</span>()
+  ..<span class="prop">color</span> = Colors.<span class="prop">red</span>
+  ..<span class="prop">strokeWidth</span> = <span class="num">2.0</span>
+  ..<span class="prop">style</span> = PaintingStyle.<span class="prop">stroke</span>;</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 07 异步进阶 -->
+<section class="section reveal" id="async">
+  <div class="section-header">
+    <span class="section-number">07</span>
+    <h2 class="section-title">异步进阶 — Future &amp; Stream</h2>
+  </div>
+  <p class="section-desc">JS 的 Promise 和 Dart 的 Future 几乎一一对应。Dart 还有 Stream，类似 JS 的 EventSource / RxJS Observable。</p>
+
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-col-header js"><span class="icon">JS</span> JavaScript / TypeScript</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag ts">TS</span></div>
+<pre><span class="cm">// Promise + async/await</span>
+<span class="kw">async function</span> <span class="fn">fetchUser</span>(): <span class="type">Promise</span>&lt;<span class="type">User</span>&gt; {
+  <span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">axios</span>.<span class="fn">get</span>(url);
+  <span class="kw">return</span> res.data;
+}
+
+<span class="cm">// Promise.all 并发</span>
+<span class="kw">const</span> [a, b] = <span class="kw">await</span> <span class="type">Promise</span>.<span class="fn">all</span>([
+  <span class="fn">fetchA</span>(), <span class="fn">fetchB</span>()
+]);
+
+<span class="cm">// .then 链式</span>
+<span class="fn">fetchUser</span>().<span class="fn">then</span>(user <span class="op">=></span>
+  <span class="fn">console</span>.<span class="fn">log</span>(user.name));
+
+<span class="cm">// EventSource (SSE)</span>
+<span class="kw">const</span> es = <span class="kw">new</span> <span class="fn">EventSource</span>(<span class="str">'/stream'</span>);
+es.<span class="fn">onmessage</span> = (e) <span class="op">=></span> {
+  <span class="fn">console</span>.<span class="fn">log</span>(e.data);
+};</pre>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header diff"><span class="icon">⇄</span> 差异说明</div>
+      <div style="padding:.5rem 0;font-size:.83rem;color:var(--text-secondary);line-height:1.9">
+        <p><code>Promise</code> → <code style="color:var(--accent-flutter)">Future</code></p>
+        <p><code>async/await</code> 写法几乎一样</p>
+        <p><code>Promise.all</code> → <code style="color:var(--accent-flutter)">Future.wait</code></p>
+        <p><code>.then()</code> → <code style="color:var(--accent-flutter)">.then()</code>（一样）</p>
+        <p><code>EventSource</code> → <code style="color:var(--accent-flutter)">Stream</code></p>
+        <p><code>onmessage</code> → <code style="color:var(--accent-flutter)">.listen()</code></p>
+        <p>Dart 有 <code style="color:var(--accent-flutter)">async*</code> + <code style="color:var(--accent-flutter)">yield</code> 生成 Stream</p>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header flutter"><span class="icon">D</span> Dart</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span></div>
+<pre><span class="cm">// Future + async/await</span>
+<span class="type">Future</span>&lt;<span class="type">User</span>&gt; <span class="fn">fetchUser</span>() <span class="kw">async</span> {
+  <span class="kw">final</span> res = <span class="kw">await</span> dio.<span class="fn">get</span>(url);
+  <span class="kw">return</span> <span class="type">User</span>.<span class="fn">fromJson</span>(res.data);
+}
+
+<span class="cm">// Future.wait 并发</span>
+<span class="kw">final</span> results = <span class="kw">await</span> <span class="type">Future</span>.<span class="fn">wait</span>([
+  <span class="fn">fetchA</span>(), <span class="fn">fetchB</span>()
+]);
+
+<span class="cm">// .then 链式</span>
+<span class="fn">fetchUser</span>().<span class="fn">then</span>((user) <span class="op">=></span>
+  <span class="fn">print</span>(user.name));
+
+<span class="cm">// Stream ≈ EventSource</span>
+<span class="type">Stream</span>&lt;<span class="type">String</span>&gt; <span class="fn">sseStream</span>() <span class="kw">async*</span> {
+  <span class="kw">yield</span> <span class="str">'chunk1'</span>;
+  <span class="kw">yield</span> <span class="str">'chunk2'</span>;
+}
+stream.<span class="fn">listen</span>((data) <span class="op">=></span> <span class="fn">print</span>(data));</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="info-card">
+      <h3><span class="emoji">📦</span> Future = 单次异步结果</h3>
+      <ul>
+        <li>等价于 JS 的 <code>Promise</code></li>
+        <li>一次请求，一次返回</li>
+        <li>用 <code>async/await</code> 或 <code>.then()</code></li>
+        <li>场景：API 请求、文件读取、延时操作</li>
+      </ul>
+    </div>
+    <div class="info-card">
+      <h3><span class="emoji">🌊</span> Stream = 持续数据流</h3>
+      <ul>
+        <li>等价于 JS 的 <code>EventSource</code> / RxJS <code>Observable</code></li>
+        <li>持续推送多个值</li>
+        <li>用 <code>.listen()</code> 或 <code>await for</code></li>
+        <li>场景：SSE 对话、WebSocket、实时数据</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 08 路由对比 -->
+<section class="section reveal" id="routing">
+  <div class="section-header">
+    <span class="section-number">08</span>
+    <h2 class="section-title">路由对比</h2>
+  </div>
+  <p class="section-desc">前端路由你很熟悉了。Vue Router、React Router 和 Flutter GetX 路由的思路完全一致：定义路径 → 映射组件/页面。</p>
+
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-col-header vue"><span class="icon">V</span> Vue Router</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag vue-tag">VUE</span></div>
+<pre><span class="cm">// router/index.ts</span>
+<span class="kw">const</span> routes = [
+  {
+    <span class="prop">path</span>: <span class="str">'/'</span>,
+    <span class="prop">component</span>: <span class="fn">Home</span>,
+  },
+  {
+    <span class="prop">path</span>: <span class="str">'/user/:id'</span>,
+    <span class="prop">component</span>: <span class="fn">UserDetail</span>,
+  },
+];
+
+<span class="cm">// 导航</span>
+router.<span class="fn">push</span>(<span class="str">'/user/123'</span>);
+router.<span class="fn">push</span>({
+  <span class="prop">name</span>: <span class="str">'user'</span>,
+  <span class="prop">params</span>: { <span class="prop">id</span>: <span class="str">'123'</span> }
+});</pre>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header react-h"><span class="icon">R</span> React Router</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag jsx">JSX</span></div>
+<pre><span class="cm">// App.tsx</span>
+&lt;<span class="tag">Routes</span>&gt;
+  &lt;<span class="tag">Route</span> <span class="attr">path</span>=<span class="str">"/"</span>
+    <span class="attr">element</span>={&lt;<span class="fn">Home</span> /&gt;} /&gt;
+  &lt;<span class="tag">Route</span> <span class="attr">path</span>=<span class="str">"/user/:id"</span>
+    <span class="attr">element</span>={&lt;<span class="fn">UserDetail</span> /&gt;} /&gt;
+&lt;/<span class="tag">Routes</span>&gt;
+
+<span class="cm">// 导航</span>
+<span class="kw">const</span> navigate = <span class="fn">useNavigate</span>();
+<span class="fn">navigate</span>(<span class="str">'/user/123'</span>);
+
+<span class="cm">// 获取参数</span>
+<span class="kw">const</span> { id } = <span class="fn">useParams</span>();</pre>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header flutter"><span class="icon">D</span> Flutter GetX</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span></div>
+<pre><span class="cm">// routes.dart</span>
+<span class="kw">final</span> routes = [
+  <span class="fn">GetPage</span>(
+    <span class="prop">name</span>: <span class="str">'/'</span>,
+    <span class="prop">page</span>: () <span class="op">=></span> <span class="fn">HomePage</span>(),
+  ),
+  <span class="fn">GetPage</span>(
+    <span class="prop">name</span>: <span class="str">'/user/:id'</span>,
+    <span class="prop">page</span>: () <span class="op">=></span> <span class="fn">UserDetailPage</span>(),
+  ),
+];
+
+<span class="cm">// 导航</span>
+<span class="type">Get</span>.<span class="fn">toNamed</span>(<span class="str">'/user/123'</span>);
+
+<span class="cm">// 获取参数</span>
+<span class="kw">final</span> id = <span class="type">Get</span>.parameters[<span class="str">'id'</span>];</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 09 样式 & 布局 -->
+<section class="section reveal" id="style-layout">
+  <div class="section-header">
+    <span class="section-number">09</span>
+    <h2 class="section-title">样式 &amp; 布局 — 万物皆 Widget</h2>
+  </div>
+  <p class="section-desc">前端用 HTML + CSS 写布局，Flutter 没有 HTML 也没有 CSS — 一切都是 Widget 对象。CSS 属性变成了 Widget 的构造参数。</p>
+
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-col-header web"><span class="icon">W</span> HTML / CSS</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag html-tag">HTML</span></div>
+<pre><span class="cm">&lt;!-- HTML 结构 --&gt;</span>
+&lt;<span class="tag">div</span> <span class="attr">class</span>=<span class="str">"card"</span>&gt;
+  &lt;<span class="tag">h2</span>&gt;Hello&lt;/<span class="tag">h2</span>&gt;
+  &lt;<span class="tag">p</span>&gt;World&lt;/<span class="tag">p</span>&gt;
+  &lt;<span class="tag">button</span> <span class="attr">@click</span>=<span class="str">"onClick"</span>&gt;
+    Click Me
+  &lt;/<span class="tag">button</span>&gt;
+&lt;/<span class="tag">div</span>&gt;</pre>
+      </div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag css-tag">CSS</span></div>
+<pre><span class="tag">.card</span> {
+  <span class="prop">padding</span>: <span class="num">16px</span>;
+  <span class="prop">background</span>: <span class="str">white</span>;
+  <span class="prop">border-radius</span>: <span class="num">12px</span>;
+  <span class="prop">box-shadow</span>: <span class="num">0 2px 8px</span> <span class="fn">rgba</span>(<span class="num">0,0,0,.12</span>);
+  <span class="prop">display</span>: <span class="str">flex</span>;
+  <span class="prop">flex-direction</span>: <span class="str">column</span>;
+  <span class="prop">gap</span>: <span class="num">8px</span>;
+}</pre>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header diff"><span class="icon">⇄</span> 差异说明</div>
+      <div style="padding:.5rem 0;font-size:.83rem;color:var(--text-secondary);line-height:1.9">
+        <p><code>&lt;div&gt;</code> → <code style="color:var(--accent-flutter)">Container</code></p>
+        <p><code>padding</code> → <code style="color:var(--accent-flutter)">EdgeInsets</code></p>
+        <p><code>border-radius</code> → <code style="color:var(--accent-flutter)">BorderRadius</code></p>
+        <p><code>box-shadow</code> → <code style="color:var(--accent-flutter)">BoxShadow</code></p>
+        <p><code>flex-direction: column</code> → <code style="color:var(--accent-flutter)">Column</code> Widget</p>
+        <p><code>flex-direction: row</code> → <code style="color:var(--accent-flutter)">Row</code> Widget</p>
+        <p><code>gap</code> → <code style="color:var(--accent-flutter)">SizedBox</code></p>
+        <p>没有 CSS 文件，样式写在 Widget 参数里</p>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header flutter"><span class="icon">D</span> Flutter Widget</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span></div>
+<pre><span class="fn">Container</span>(
+  <span class="prop">padding</span>: <span class="fn">EdgeInsets</span>.<span class="fn">all</span>(<span class="num">16</span>),
+  <span class="prop">decoration</span>: <span class="fn">BoxDecoration</span>(
+    <span class="prop">color</span>: Colors.<span class="prop">white</span>,
+    <span class="prop">borderRadius</span>:
+      <span class="fn">BorderRadius</span>.<span class="fn">circular</span>(<span class="num">12</span>),
+    <span class="prop">boxShadow</span>: [<span class="fn">BoxShadow</span>(
+      <span class="prop">color</span>: Colors.<span class="prop">black12</span>,
+      <span class="prop">blurRadius</span>: <span class="num">8</span>)],
+  ),
+  <span class="prop">child</span>: <span class="fn">Column</span>(
+    <span class="prop">children</span>: [
+      <span class="fn">Text</span>(<span class="str">'Hello'</span>,
+        <span class="prop">style</span>: <span class="fn">TextStyle</span>(
+          <span class="prop">fontSize</span>: <span class="num">20</span>,
+          <span class="prop">fontWeight</span>: FontWeight.<span class="prop">bold</span>)),
+      <span class="fn">SizedBox</span>(<span class="prop">height</span>: <span class="num">8</span>),
+      <span class="fn">Text</span>(<span class="str">'World'</span>),
+      <span class="fn">SizedBox</span>(<span class="prop">height</span>: <span class="num">16</span>),
+      <span class="fn">ElevatedButton</span>(
+        <span class="prop">onPressed</span>: onClick,
+        <span class="prop">child</span>: <span class="fn">Text</span>(<span class="str">'Click Me'</span>)),
+    ],
+  ),
+)</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <h3><span class="emoji">🗺️</span> HTML → Flutter Widget 映射表</h3>
+    <table class="mapping-table" style="margin-top:.75rem">
+      <thead><tr><th>HTML / CSS</th><th>Flutter Widget</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td class="web-col">&lt;div&gt;</td><td class="flutter-col">Container</td><td>通用容器</td></tr>
+        <tr><td class="web-col">&lt;span&gt; / &lt;p&gt;</td><td class="flutter-col">Text</td><td>文本显示</td></tr>
+        <tr><td class="web-col">&lt;button&gt;</td><td class="flutter-col">ElevatedButton / TextButton</td><td>按钮</td></tr>
+        <tr><td class="web-col">&lt;input&gt;</td><td class="flutter-col">TextField</td><td>输入框</td></tr>
+        <tr><td class="web-col">&lt;img&gt;</td><td class="flutter-col">Image</td><td>图片</td></tr>
+        <tr><td class="web-col">&lt;ul&gt; / &lt;li&gt;</td><td class="flutter-col">ListView</td><td>列表</td></tr>
+        <tr><td class="web-col">display: flex (row)</td><td class="flutter-col">Row</td><td>横向排列</td></tr>
+        <tr><td class="web-col">display: flex (column)</td><td class="flutter-col">Column</td><td>纵向排列</td></tr>
+        <tr><td class="web-col">position: absolute</td><td class="flutter-col">Stack + Positioned</td><td>层叠布局</td></tr>
+        <tr><td class="web-col">overflow: scroll</td><td class="flutter-col">SingleChildScrollView</td><td>滚动区域</td></tr>
+        <tr><td class="web-col">padding</td><td class="flutter-col">Padding / EdgeInsets</td><td>内边距</td></tr>
+        <tr><td class="web-col">margin</td><td class="flutter-col">Container(margin:)</td><td>外边距</td></tr>
+        <tr><td class="web-col">gap</td><td class="flutter-col">SizedBox</td><td>间距</td></tr>
+        <tr><td class="web-col">display: grid</td><td class="flutter-col">GridView</td><td>网格布局</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 10 状态管理对比 -->
+<section class="section reveal" id="state">
+  <div class="section-header">
+    <span class="section-number">10</span>
+    <h2 class="section-title">状态管理对比</h2>
+  </div>
+  <p class="section-desc">前端的状态管理你最熟了。Vue 的 ref/reactive、React 的 useState、Flutter 的 GetX — 核心思路都是：声明响应式变量 → 变量改变 → UI 自动更新。</p>
+
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-col-header vue"><span class="icon">V</span> Vue Composition API</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag vue-tag">VUE</span></div>
+<pre><span class="cm">// composable</span>
+<span class="kw">const</span> count = <span class="fn">ref</span>(<span class="num">0</span>);
+<span class="kw">const</span> user = <span class="fn">reactive</span>({
+  <span class="prop">name</span>: <span class="str">'Tom'</span>,
+  <span class="prop">age</span>: <span class="num">25</span>,
+});
+
+<span class="cm">// 修改 → 自动更新 UI</span>
+count.<span class="prop">value</span>++;
+user.<span class="prop">name</span> = <span class="str">'Jerry'</span>;
+
+<span class="cm">// computed</span>
+<span class="kw">const</span> doubled = <span class="fn">computed</span>(
+  () <span class="op">=></span> count.<span class="prop">value</span> * <span class="num">2</span>
+);
+
+<span class="cm">// watch</span>
+<span class="fn">watch</span>(count, (val) <span class="op">=></span> {
+  <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">'changed:'</span>, val);
+});</pre>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header react-h"><span class="icon">R</span> React Hooks</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag jsx">JSX</span></div>
+<pre><span class="cm">// useState</span>
+<span class="kw">const</span> [count, setCount] =
+  <span class="fn">useState</span>(<span class="num">0</span>);
+<span class="kw">const</span> [user, setUser] =
+  <span class="fn">useState</span>({ <span class="prop">name</span>: <span class="str">'Tom'</span> });
+
+<span class="cm">// 修改 → 自动更新 UI</span>
+<span class="fn">setCount</span>(count + <span class="num">1</span>);
+<span class="fn">setUser</span>({ ...user, <span class="prop">name</span>: <span class="str">'Jerry'</span> });
+
+<span class="cm">// useMemo ≈ computed</span>
+<span class="kw">const</span> doubled = <span class="fn">useMemo</span>(
+  () <span class="op">=></span> count * <span class="num">2</span>, [count]
+);
+
+<span class="cm">// useEffect ≈ watch</span>
+<span class="fn">useEffect</span>(() <span class="op">=></span> {
+  <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">'changed:'</span>, count);
+}, [count]);</pre>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header flutter"><span class="icon">D</span> Flutter GetX</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span></div>
+<pre><span class="cm">// .obs = 响应式变量</span>
+<span class="kw">final</span> count = <span class="num">0</span>.<span class="prop">obs</span>;
+<span class="kw">final</span> user = {
+  <span class="str">'name'</span>: <span class="str">'Tom'</span>
+}.<span class="prop">obs</span>;
+
+<span class="cm">// 修改 → 自动更新 UI</span>
+count.<span class="prop">value</span>++;
+user[<span class="str">'name'</span>] = <span class="str">'Jerry'</span>;
+
+<span class="cm">// UI 中用 Obx 自动监听</span>
+<span class="fn">Obx</span>(() <span class="op">=></span> <span class="fn">Text</span>(
+  <span class="str">'${count.value}'</span>));
+
+<span class="cm">// ever ≈ watch</span>
+<span class="fn">ever</span>(count, (val) {
+  <span class="fn">print</span>(<span class="str">'changed: $val'</span>);
+});
+
+<span class="cm">// workers: debounce, interval...</span>
+<span class="fn">debounce</span>(count, (val) {
+  <span class="fn">print</span>(<span class="str">'debounced: $val'</span>);
+});</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="info-card">
+      <h3><span class="emoji">🔄</span> StatefulWidget — Flutter 原生状态</h3>
+      <ul>
+        <li>类似 React Class Component 的 <code>setState</code></li>
+        <li>需要手动调用 <code>setState(() {})</code> 触发刷新</li>
+        <li>适合简单的局部状态</li>
+        <li>代码量较多，需要写两个类</li>
+      </ul>
+    </div>
+    <div class="info-card">
+      <h3><span class="emoji">⚡</span> GetX — 更像前端的方式</h3>
+      <ul>
+        <li><code>.obs</code> ≈ Vue 的 <code>ref()</code></li>
+        <li><code>Obx()</code> ≈ Vue 的模板自动追踪</li>
+        <li>不需要 <code>setState</code>，改值就刷新</li>
+        <li>还自带路由、依赖注入、国际化</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 11 网络请求对比 -->
+<section class="section reveal" id="http">
+  <div class="section-header">
+    <span class="section-number">11</span>
+    <h2 class="section-title">网络请求对比 — Axios vs Dio</h2>
+  </div>
+  <p class="section-desc">前端用 Axios，Flutter 用 Dio。两者 API 设计非常像：都有拦截器、都支持请求/响应拦截、都能配置 baseURL。</p>
+
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-col-header js"><span class="icon">JS</span> Axios</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag ts">TS</span></div>
+<pre><span class="cm">// 创建实例</span>
+<span class="kw">const</span> http = axios.<span class="fn">create</span>({
+  <span class="prop">baseURL</span>: <span class="str">'https://api.com'</span>,
+  <span class="prop">timeout</span>: <span class="num">10000</span>,
+});
+
+<span class="cm">// 请求拦截器</span>
+http.interceptors.request.<span class="fn">use</span>(
+  (config) <span class="op">=></span> {
+    config.headers[<span class="str">'Authorization'</span>]
+      = <span class="str">`Bearer ${token}`</span>;
+    <span class="kw">return</span> config;
+  }
+);
+
+<span class="cm">// 响应拦截器</span>
+http.interceptors.response.<span class="fn">use</span>(
+  (res) <span class="op">=></span> res.data,
+  (err) <span class="op">=></span> {
+    <span class="kw">if</span> (err.response?.status === <span class="num">401</span>) {
+      router.<span class="fn">push</span>(<span class="str">'/login'</span>);
+    }
+    <span class="kw">return</span> <span class="type">Promise</span>.<span class="fn">reject</span>(err);
+  }
+);
+
+<span class="cm">// 使用</span>
+<span class="kw">const</span> res = <span class="kw">await</span> http.<span class="fn">get</span>(<span class="str">'/users'</span>);
+<span class="kw">const</span> res2 = <span class="kw">await</span> http.<span class="fn">post</span>(<span class="str">'/users'</span>, data);</pre>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header diff"><span class="icon">⇄</span> 差异说明</div>
+      <div style="padding:.5rem 0;font-size:.83rem;color:var(--text-secondary);line-height:1.9">
+        <p><code>axios.create</code> → <code style="color:var(--accent-flutter)">Dio(BaseOptions(...))</code></p>
+        <p><code>interceptors.request</code> → <code style="color:var(--accent-flutter)">InterceptorsWrapper.onRequest</code></p>
+        <p><code>interceptors.response</code> → <code style="color:var(--accent-flutter)">InterceptorsWrapper.onResponse</code></p>
+        <p><code>err.response.status</code> → <code style="color:var(--accent-flutter)">DioException.response?.statusCode</code></p>
+        <p>API 设计几乎一一对应</p>
+        <p>Dio 还支持文件上传进度回调</p>
+        <p>Dio 支持 SSE 流式响应</p>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header flutter"><span class="icon">D</span> Dio</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span></div>
+<pre><span class="cm">// 创建实例</span>
+<span class="kw">final</span> dio = <span class="fn">Dio</span>(<span class="fn">BaseOptions</span>(
+  <span class="prop">baseUrl</span>: <span class="str">'https://api.com'</span>,
+  <span class="prop">connectTimeout</span>:
+    <span class="type">Duration</span>(<span class="prop">seconds</span>: <span class="num">10</span>),
+));
+
+<span class="cm">// 拦截器</span>
+dio.interceptors.<span class="fn">add</span>(
+  <span class="fn">InterceptorsWrapper</span>(
+    <span class="prop">onRequest</span>: (options, handler) {
+      options.headers[<span class="str">'Authorization'</span>]
+        = <span class="str">'Bearer $token'</span>;
+      handler.<span class="fn">next</span>(options);
+    },
+    <span class="prop">onError</span>: (err, handler) {
+      <span class="kw">if</span> (err.response?.<span class="prop">statusCode</span>
+          == <span class="num">401</span>) {
+        <span class="type">Get</span>.<span class="fn">offAllNamed</span>(<span class="str">'/login'</span>);
+      }
+      handler.<span class="fn">next</span>(err);
+    },
+  ),
+);
+
+<span class="cm">// 使用</span>
+<span class="kw">final</span> res = <span class="kw">await</span> dio.<span class="fn">get</span>(<span class="str">'/users'</span>);
+<span class="kw">final</span> res2 = <span class="kw">await</span> dio.<span class="fn">post</span>(<span class="str">'/users'</span>,
+  <span class="prop">data</span>: data);</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 12 Widget 体系 -->
+<section class="section reveal" id="widgets">
+  <div class="section-header">
+    <span class="section-number">12</span>
+    <h2 class="section-title">Widget 体系</h2>
+  </div>
+  <p class="section-desc">前端同学可以这样理解：Flutter 的 Widget 就是 React/Vue 的组件。每个 UI 元素都是一个类的实例，通过构造函数的命名参数配置属性（≈ props）。</p>
+
+  <div class="two-col">
+    <div class="info-card">
+      <h3><span class="emoji">🧱</span> 基础 Widget</h3>
+      <ul>
+        <li><code>Text</code> — 文本（≈ &lt;span&gt;）</li>
+        <li><code>Image</code> — 图片（≈ &lt;img&gt;）</li>
+        <li><code>Icon</code> — 图标（≈ &lt;i&gt;）</li>
+        <li><code>ElevatedButton</code> — 按钮（≈ &lt;button&gt;）</li>
+        <li><code>TextField</code> — 输入框（≈ &lt;input&gt;）</li>
+        <li><code>Container</code> — 容器（≈ &lt;div&gt;）</li>
+        <li><code>Scaffold</code> — 页面骨架（≈ Layout 组件）</li>
+      </ul>
+    </div>
+    <div class="info-card">
+      <h3><span class="emoji">📐</span> 布局 Widget</h3>
+      <ul>
+        <li><code>Row</code> — 横向排列（≈ flex-direction: row）</li>
+        <li><code>Column</code> — 纵向排列（≈ flex-direction: column）</li>
+        <li><code>Stack</code> — 层叠（≈ position: relative/absolute）</li>
+        <li><code>ListView</code> — 滚动列表（≈ v-for / .map()）</li>
+        <li><code>GridView</code> — 网格（≈ display: grid）</li>
+        <li><code>Expanded</code> — 弹性填充（≈ flex: 1）</li>
+        <li><code>Wrap</code> — 自动换行（≈ flex-wrap: wrap）</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <h3><span class="emoji">🔀</span> 状态 Widget 对比</h3>
+    <table class="mapping-table" style="margin-top:.75rem">
+      <thead><tr><th>概念</th><th>React</th><th>Vue</th><th>Flutter</th></tr></thead>
+      <tbody>
+        <tr><td>无状态组件</td><td class="npm-col">Function Component</td><td class="web-col">&lt;script setup&gt; (无 ref)</td><td class="flutter-col">StatelessWidget</td></tr>
+        <tr><td>有状态组件</td><td class="npm-col">useState Hook</td><td class="web-col">ref() / reactive()</td><td class="flutter-col">StatefulWidget</td></tr>
+        <tr><td>全局状态</td><td class="npm-col">useContext / Redux</td><td class="web-col">Pinia / Vuex</td><td class="flutter-col">GetX / Provider</td></tr>
+        <tr><td>生命周期-挂载</td><td class="npm-col">useEffect(fn, [])</td><td class="web-col">onMounted()</td><td class="flutter-col">initState() / onInit()</td></tr>
+        <tr><td>生命周期-卸载</td><td class="npm-col">useEffect return</td><td class="web-col">onUnmounted()</td><td class="flutter-col">dispose() / onClose()</td></tr>
+        <tr><td>条件渲染</td><td class="npm-col">{cond && &lt;X/&gt;}</td><td class="web-col">v-if</td><td class="flutter-col">if (cond) Widget()</td></tr>
+        <tr><td>列表渲染</td><td class="npm-col">{list.map(...)}</td><td class="web-col">v-for</td><td class="flutter-col">ListView.builder()</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 13 Model & Controller 模式 -->
+<section class="section reveal" id="model">
+  <div class="section-header">
+    <span class="section-number">13</span>
+    <h2 class="section-title">Model &amp; Controller 模式</h2>
+  </div>
+  <p class="section-desc">前端用 TypeScript interface/type 定义数据结构，用 Store/Hook 管理业务逻辑。Flutter 用 Dart class 定义 Entity，用 GetxController 管理状态和逻辑。</p>
+
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-col-header ts"><span class="icon">TS</span> TypeScript</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag ts">TS</span></div>
+<pre><span class="cm">// 类型定义</span>
+<span class="kw">interface</span> <span class="type">User</span> {
+  id: <span class="type">number</span>;
+  name: <span class="type">string</span>;
+  avatar?: <span class="type">string</span>;
+}
+
+<span class="cm">// API 响应解析</span>
+<span class="kw">const</span> res = <span class="kw">await</span> http.<span class="fn">get</span>&lt;<span class="type">User</span>[]&gt;(
+  <span class="str">'/users'</span>
+);
+<span class="kw">const</span> users: <span class="type">User</span>[] = res.data;</pre>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header diff"><span class="icon">⇄</span> 差异说明</div>
+      <div style="padding:.5rem 0;font-size:.83rem;color:var(--text-secondary);line-height:1.9">
+        <p>TS <code>interface</code> → Dart <code style="color:var(--accent-flutter)">class</code>（Dart 没有 interface 关键字）</p>
+        <p>TS 类型只在编译时 → Dart class 运行时也存在</p>
+        <p>TS 直接用 JSON → Dart 需要 <code style="color:var(--accent-flutter)">fromJson</code></p>
+        <p>Dart Entity 可以有方法和计算属性</p>
+        <p>TS Store → Dart <code style="color:var(--accent-flutter)">GetxController</code></p>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header flutter"><span class="icon">D</span> Dart Entity</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span></div>
+<pre><span class="cm">// Entity 定义</span>
+<span class="kw">class</span> <span class="type">User</span> {
+  <span class="kw">final</span> <span class="type">int</span> id;
+  <span class="kw">final</span> <span class="type">String</span> name;
+  <span class="kw">final</span> <span class="type">String</span>? avatar;
+
+  <span class="type">User</span>({
+    <span class="kw">required</span> <span class="kw">this</span>.id,
+    <span class="kw">required</span> <span class="kw">this</span>.name,
+    <span class="kw">this</span>.avatar,
+  });
+
+  <span class="kw">factory</span> <span class="type">User</span>.<span class="fn">fromJson</span>(<span class="type">Map</span> json)
+    <span class="op">=></span> <span class="type">User</span>(
+      <span class="prop">id</span>: json[<span class="str">'id'</span>],
+      <span class="prop">name</span>: json[<span class="str">'name'</span>],
+      <span class="prop">avatar</span>: json[<span class="str">'avatar'</span>],
+    );
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <h3><span class="emoji">🎮</span> Controller 代码示例 — 类似 Pinia Store</h3>
+    <div class="two-col" style="margin-top:.75rem">
+      <div class="code-block"><div class="code-header"><span class="lang-tag ts">TS</span>Pinia Store</div>
+<pre><span class="cm">// stores/user.ts</span>
+<span class="kw">export const</span> <span class="fn">useUserStore</span> = <span class="fn">defineStore</span>(
+  <span class="str">'user'</span>, () <span class="op">=></span> {
+    <span class="kw">const</span> loading = <span class="fn">ref</span>(<span class="kw">false</span>);
+    <span class="kw">const</span> userList = <span class="fn">ref</span>&lt;<span class="type">User</span>[]&gt;([]);
+    <span class="kw">const</span> error = <span class="fn">ref</span>(<span class="str">''</span>);
+
+    <span class="kw">async function</span> <span class="fn">fetchUsers</span>() {
+      loading.<span class="prop">value</span> = <span class="kw">true</span>;
+      <span class="kw">try</span> {
+        <span class="kw">const</span> res = <span class="kw">await</span> http.<span class="fn">get</span>(<span class="str">'/users'</span>);
+        userList.<span class="prop">value</span> = res.data;
+      } <span class="kw">catch</span> (e) {
+        error.<span class="prop">value</span> = e.message;
+      } <span class="kw">finally</span> {
+        loading.<span class="prop">value</span> = <span class="kw">false</span>;
+      }
+    }
+
+    <span class="kw">return</span> { loading, userList, <span class="fn">fetchUsers</span> };
+  }
+);</pre>
+      </div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span>GetxController</div>
+<pre><span class="kw">class</span> <span class="type">UserController</span> <span class="kw">extends</span> <span class="type">GetxController</span> {
+  <span class="kw">final</span> isLoading = <span class="kw">false</span>.<span class="prop">obs</span>;
+  <span class="kw">final</span> userList = &lt;<span class="type">User</span>&gt;[].<span class="prop">obs</span>;
+  <span class="kw">final</span> errorMsg = <span class="str">''</span>.<span class="prop">obs</span>;
+
+  <span class="cm">// ≈ onMounted</span>
+  <span class="dec">@override</span>
+  <span class="type">void</span> <span class="fn">onInit</span>() {
+    <span class="kw">super</span>.<span class="fn">onInit</span>();
+    <span class="fn">fetchUsers</span>();
+  }
+
+  <span class="type">Future</span>&lt;<span class="type">void</span>&gt; <span class="fn">fetchUsers</span>() <span class="kw">async</span> {
+    isLoading.<span class="prop">value</span> = <span class="kw">true</span>;
+    <span class="kw">try</span> {
+      <span class="kw">final</span> res = <span class="kw">await</span> dio.<span class="fn">get</span>(<span class="str">'/users'</span>);
+      userList.<span class="prop">value</span> = (res.data <span class="kw">as</span> <span class="type">List</span>)
+        .<span class="fn">map</span>((e) <span class="op">=></span> <span class="type">User</span>.<span class="fn">fromJson</span>(e))
+        .<span class="fn">toList</span>();
+    } <span class="kw">on</span> <span class="type">DioException</span> <span class="kw">catch</span> (e) {
+      errorMsg.<span class="prop">value</span> = e.message ?? <span class="str">'失败'</span>;
+    } <span class="kw">finally</span> {
+      isLoading.<span class="prop">value</span> = <span class="kw">false</span>;
+    }
+  }
+}
+
+<span class="cm">// UI 中 — Obx 自动监听变化</span>
+<span class="fn">Obx</span>(() <span class="op">=></span> <span class="fn">Text</span>(<span class="str">'${ctrl.userList.length}'</span>))</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 14 企业级项目架构 -->
+<section class="section reveal" id="arch">
+  <div class="section-header">
+    <span class="section-number">14</span>
+    <h2 class="section-title">企业级项目架构</h2>
+  </div>
+  <p class="section-desc">前端项目的分层架构和 Flutter 项目非常像。页面 → 状态管理 → API 层 → 数据模型，思路完全一致。</p>
+
+  <div class="arch-diagram">
+    <pre>
+  Frontend (Vue/React)                  Flutter (GetX)
+┌──────────────────────┐       ┌──────────────────────────┐
+│   Page / View        │       │   Page (Widget)          │
+│   组件 + 模板         │       │   UI 展示层               │
+├──────────────────────┤       ├──────────────────────────┤
+│   Store / Hook       │  ≈    │   GetxController         │
+│   Pinia / useState   │       │   业务逻辑 + 状态管理      │
+├──────────────────────┤       ├──────────────────────────┤
+│   API Layer          │       │   API Layer              │
+│   Axios 封装         │       │   Dio 请求封装            │
+├──────────────────────┤       ├──────────────────────────┤
+│   Types / Interface  │       │   Model / Entity         │
+│   TS 类型定义         │       │   数据模型                │
+└──────────────────────┘       └──────────────────────────┘</pre>
+    <div class="label">Frontend ↔ Flutter 分层映射</div>
+  </div>
+
+  <div class="info-card">
+    <h3><span class="emoji">📁</span> 项目目录对比</h3>
+    <div class="two-col" style="margin-top:.75rem">
+      <div class="code-block"><div class="code-header"><span class="lang-tag ts">TS</span>前端 src/</div>
+<pre>src/
+├── views/        <span class="cm">// 页面组件</span>
+├── components/   <span class="cm">// 公共组件</span>
+├── stores/       <span class="cm">// 状态管理 (Pinia)</span>
+├── api/          <span class="cm">// 接口请求</span>
+├── types/        <span class="cm">// TS 类型定义</span>
+├── utils/        <span class="cm">// 工具函数</span>
+├── router/       <span class="cm">// 路由配置</span>
+├── assets/       <span class="cm">// 静态资源</span>
+├── styles/       <span class="cm">// 全局样式</span>
+└── main.ts       <span class="cm">// 入口</span></pre>
+      </div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span>Flutter lib/</div>
+<pre>lib/
+├── api/          <span class="cm">// 接口端点（≈ api/）</span>
+├── common/
+│   ├── network/  <span class="cm">// Dio 封装（≈ utils/http）</span>
+│   ├── state/    <span class="cm">// 全局状态（≈ stores/）</span>
+│   └── widget/   <span class="cm">// 公共组件（≈ components/）</span>
+├── model/        <span class="cm">// 数据模型（≈ types/）</span>
+├── utils/        <span class="cm">// 工具函数（≈ utils/）</span>
+├── mobile/page/  <span class="cm">// 手机页面（≈ views/）</span>
+├── pad/page/     <span class="cm">// 平板页面</span>
+└── main.dart     <span class="cm">// 入口（≈ main.ts）</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <h3><span class="emoji">🚀</span> 启动流程对比</h3>
+    <div class="two-col" style="margin-top:.75rem">
+      <div class="code-block"><div class="code-header"><span class="lang-tag ts">TS</span>前端启动</div>
+<pre>main.ts
+├── createApp(App)
+├── app.use(router)
+├── app.use(pinia)
+├── 路由守卫检查 token
+│   ├── 有 → 首页
+│   └── 无 → 登录页
+└── app.mount('#app')</pre>
+      </div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span>Flutter 启动</div>
+<pre>main.dart
+├── 检测平板/手机
+├── 设置屏幕方向
+├── InitializerUtil.initializeAll()
+│   ├── SharedPreferences
+│   ├── 加载环境配置
+│   └── 读取 token
+│       ├── 有 → 自动登录 → 首页
+│       └── 无 → 登录页
+└── runApp()</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 15 依赖生态 -->
+<section class="section reveal" id="deps">
+  <div class="section-header">
+    <span class="section-number">15</span>
+    <h2 class="section-title">依赖生态 — npm ≈ pub.dev</h2>
+  </div>
+  <p class="section-desc">前端用 npm/yarn/pnpm 管理依赖，Flutter 用 pub.dev + pubspec.yaml。以下是常用依赖的对标关系。</p>
+
+  <table class="mapping-table">
+    <thead><tr><th>功能</th><th>npm 包</th><th>pub.dev 包</th><th>版本</th></tr></thead>
+    <tbody>
+      <tr><td>HTTP 请求</td><td class="npm-col">axios</td><td class="flutter-col">dio</td><td>^5.8.0</td></tr>
+      <tr><td>状态管理 + 路由 + DI</td><td class="npm-col">pinia + vue-router</td><td class="flutter-col">get (GetX)</td><td>^4.7.2</td></tr>
+      <tr><td>JSON 序列化</td><td class="npm-col">自动（JSON.parse）</td><td class="flutter-col">json_serializable</td><td>^6.8.0</td></tr>
+      <tr><td>本地存储</td><td class="npm-col">localStorage</td><td class="flutter-col">shared_preferences</td><td>^2.3.3</td></tr>
+      <tr><td>日志</td><td class="npm-col">console / winston</td><td class="flutter-col">logger</td><td>—</td></tr>
+      <tr><td>WebSocket</td><td class="npm-col">socket.io-client</td><td class="flutter-col">web_socket_channel</td><td>^3.0.3</td></tr>
+      <tr><td>国际化</td><td class="npm-col">vue-i18n / react-intl</td><td class="flutter-col">intl</td><td>0.19.0</td></tr>
+      <tr><td>文件上传</td><td class="npm-col">ali-oss</td><td class="flutter-col">flutter_oss_aliyun</td><td>^6.4.2</td></tr>
+      <tr><td>微信支付</td><td class="npm-col">wx-js-sdk</td><td class="flutter-col">fluwx</td><td>5.7.0</td></tr>
+      <tr><td>事件总线</td><td class="npm-col">mitt / EventEmitter</td><td class="flutter-col">event_bus</td><td>^2.0.1</td></tr>
+      <tr><td>权限管理</td><td class="npm-col">—（浏览器 API）</td><td class="flutter-col">permission_handler</td><td>^11.3.1</td></tr>
+      <tr><td>屏幕适配</td><td class="npm-col">postcss-px-to-viewport</td><td class="flutter-col">flutter_screenutil</td><td>^5.9.0</td></tr>
+      <tr><td>代码生成</td><td class="npm-col">—（TS 自带类型）</td><td class="flutter-col">json_serializable + build_runner</td><td>—</td></tr>
+      <tr><td>定时任务</td><td class="npm-col">setInterval / setTimeout</td><td class="flutter-col">Timer / Future.delayed</td><td>内置</td></tr>
+    </tbody>
+  </table>
+
+  <div class="dep-grid">
+    <div class="dep-card"><div class="dep-icon net">NET</div><div class="dep-info"><h5>dio ^5.8.0</h5><span>≈ axios，拦截器/上传/SSE</span></div></div>
+    <div class="dep-card"><div class="dep-icon state">IOC</div><div class="dep-info"><h5>get ^4.7.2</h5><span>≈ pinia + vue-router 全家桶</span></div></div>
+    <div class="dep-card"><div class="dep-icon ui">UI</div><div class="dep-info"><h5>flutter_screenutil ^5.9.0</h5><span>≈ postcss-px-to-viewport 适配</span></div></div>
+    <div class="dep-card"><div class="dep-icon media">MDA</div><div class="dep-info"><h5>video_player + chewie</h5><span>≈ video.js 视频播放</span></div></div>
+    <div class="dep-card"><div class="dep-icon file">FIL</div><div class="dep-info"><h5>flutter_oss_aliyun ^6.4.2</h5><span>≈ ali-oss 文件上传</span></div></div>
+    <div class="dep-card"><div class="dep-icon pay">PAY</div><div class="dep-info"><h5>fluwx 5.7.0</h5><span>≈ wx-js-sdk 微信支付</span></div></div>
+  </div>
+</section>
+
+<!-- 16 多环境配置 -->
+<section class="section reveal" id="env">
+  <div class="section-header">
+    <span class="section-number">16</span>
+    <h2 class="section-title">多环境配置</h2>
+  </div>
+  <p class="section-desc">前端用 <code>.env</code> 文件管理环境变量，Flutter 用 YAML 配置文件。思路一致，格式不同。</p>
+
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-col-header js"><span class="icon">JS</span> 前端 .env</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag js">ENV</span>.env.development</div>
+<pre><span class="cm"># .env.development</span>
+<span class="prop">VITE_API_BASE</span>=<span class="str">https://api-dev.xxx.cn</span>
+<span class="prop">VITE_APP_TITLE</span>=<span class="str">My App (Dev)</span>
+
+<span class="cm"># .env.production</span>
+<span class="prop">VITE_API_BASE</span>=<span class="str">https://api.xxx.cn</span>
+<span class="prop">VITE_APP_TITLE</span>=<span class="str">My App</span>
+
+<span class="cm"># .env.staging</span>
+<span class="prop">VITE_API_BASE</span>=<span class="str">https://api-uat.xxx.cn</span>
+<span class="prop">VITE_APP_TITLE</span>=<span class="str">My App (UAT)</span></pre>
+      </div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag ts">TS</span>读取配置</div>
+<pre><span class="cm">// 读取环境变量</span>
+<span class="kw">const</span> apiBase =
+  <span class="kw">import</span>.meta.env.<span class="prop">VITE_API_BASE</span>;
+
+<span class="cm">// 启动指定环境</span>
+<span class="cm">// vite --mode development</span>
+<span class="cm">// vite --mode production</span></pre>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header diff"><span class="icon">⇄</span> 差异说明</div>
+      <div style="padding:.5rem 0;font-size:.83rem;color:var(--text-secondary);line-height:1.9">
+        <p>前端 <code>.env.{mode}</code> 多文件</p>
+        <p>Flutter <code style="color:var(--accent-flutter)">build_config.yaml</code> 单文件</p>
+        <p><code>VITE_</code> 前缀 → yaml 字段</p>
+        <p><code>import.meta.env</code> → <code style="color:var(--accent-flutter)">SetApi.loadConfigFromYaml()</code></p>
+        <p>都支持多环境切换</p>
+        <p>Flutter 支持 test/uat/dev/release 四环境</p>
+        <p>Flutter 还能配置代理 IP</p>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-header flutter"><span class="icon">D</span> Flutter YAML</div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag yaml">YAML</span>build_config.yaml</div>
+<pre><span class="prop">env</span>: <span class="str">test</span>       <span class="cm"># test|uat|dev|release</span>
+<span class="prop">proxy</span>: <span class="kw">false</span>
+<span class="prop">proxyIP</span>: <span class="str">192.168.1.1</span>
+
+<span class="cm"># API 域名规则：</span>
+<span class="cm"># test    → api-test.xxx.cn</span>
+<span class="cm"># uat     → api-uat.xxx.cn</span>
+<span class="cm"># dev     → api-dev.xxx.cn</span>
+<span class="cm"># release → api.xxx.cn</span></pre>
+      </div>
+      <div class="code-block"><div class="code-header"><span class="lang-tag dart">DART</span>读取配置</div>
+<pre><span class="cm">// 读取配置</span>
+<span class="cm">// SetApi.loadConfigFromYaml()</span>
+<span class="cm">// ≈ import.meta.env.VITE_API_BASE</span>
+
+<span class="cm">// 切换环境：修改 yaml 的 env 字段</span>
+<span class="cm">// 不需要重新启动命令</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="method-tags">
+    <span class="method-tag">📖 对比法学习</span>
+    <span class="method-tag">❓ 追问式学习</span>
+    <span class="method-tag">🤖 AI 辅助开发</span>
+    <span class="method-tag">🌐 前端开发者视角</span>
+  </div>
+  <p>用你已有的 Vue / React 知识，快速掌握 Flutter 开发</p>
+  <p style="margin-top:.5rem;color:var(--text-muted)">Dart ≈ TypeScript 的近亲 + 自带 UI 框架，不需要从零开始</p>
+</footer>
+
+</div>
+
+<script>
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+const sections = document.querySelectorAll('.section[id]');
+const navLinks = document.querySelectorAll('.nav-link');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(section => { const top = section.offsetTop - 120; if (scrollY >= top) current = section.getAttribute('id'); });
+  navLinks.forEach(link => { link.classList.toggle('active', link.getAttribute('href') === '#' + current); });
+});
+navLinks.forEach(link => {
+  link.addEventListener('click', () => { if (window.innerWidth <= 900) document.querySelector('.sidebar').classList.remove('open'); });
+});
+</script>
+</body>
+</html>
